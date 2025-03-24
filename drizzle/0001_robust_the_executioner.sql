@@ -1,0 +1,1 @@
+ALTER TABLE "short_form" ADD COLUMN "is_active" boolean DEFAULT true NOT NULL;

@@ -1,0 +1,28 @@
+{
+  "name": "mini-project",
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "dev": "bun run --hot src/index.ts"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "axios": "^1.8.4",
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.41.0",
+    "hono": "^4.7.5",
+    "http-status": "^2.1.0",
+    "otp-generator": "^4.0.1",
+    "pg": "^8.14.1",
+    "yup": "^1.6.1"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/bun": "latest",
+    "@types/otp-generator": "^4.0.2",
+    "@types/pg": "^8.11.11",
+    "drizzle-kit": "^0.30.5",
+    "tsx": "^4.19.3"
+  }
+}
