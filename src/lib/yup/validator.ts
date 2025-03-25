@@ -6,8 +6,8 @@ import type {
   TypedResponse,
   ValidationTargets,
 } from 'hono'
-import * as yup from 'yup'
 import { validator } from 'hono/validator'
+import * as yup from 'yup'
 
 const parseErrorSchema = (
   error: yup.ValidationError,
@@ -76,10 +76,10 @@ export type Hook<
   },
   c: Context<E, P>,
 ) =>
-  | Response
-  | void
-  | TypedResponse<O>
-  | Promise<Response | void | TypedResponse<O>>
+    | Response
+    | void
+    | TypedResponse<O>
+    | Promise<Response | void | TypedResponse<O>>
 
 type HasUndefined<T> = undefined extends T ? true : false
 
@@ -92,16 +92,16 @@ export const yupValidator = <
   Out = yup.Asserts<T>,
   I extends Input = {
     in: HasUndefined<In> extends true
-      ? {
-          [K in Target]?: In extends ValidationTargets[K]
-            ? In
-            : { [K2 in keyof In]?: ValidationTargets[K][K2] }
-        }
-      : {
-          [K in Target]: In extends ValidationTargets[K]
-            ? In
-            : { [K2 in keyof In]: ValidationTargets[K][K2] }
-        }
+    ? {
+      [K in Target]?: In extends ValidationTargets[K]
+      ? In
+      : { [K2 in keyof In]?: ValidationTargets[K][K2] }
+    }
+    : {
+      [K in Target]: In extends ValidationTargets[K]
+      ? In
+      : { [K2 in keyof In]: ValidationTargets[K][K2] }
+    }
     out: { [K in Target]: Out }
   },
   V extends I = I,
@@ -113,7 +113,6 @@ export const yupValidator = <
   // @ts-expect-error not typed well
   validator(target, async (value, c) => {
     const result = await safeParseAsync(schema, value)
-
     if (!result.success) {
       if (hook) {
         const hookResult = await hook(
@@ -140,7 +139,7 @@ export const yupValidator = <
       return c.json(
         {
           data: null,
-          message: parseErrorSchema(result.error),
+          message: result.error.errors,
         },
         400,
       )

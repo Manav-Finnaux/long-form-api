@@ -1,4 +1,5 @@
 import { pgTable } from "drizzle-orm/pg-core";
+import { encryptedText } from "../custom-data-types";
 import { applicationStatusEnum, maritalStatusEnum } from "./enums";
 
 
@@ -6,23 +7,19 @@ export const longFormTable = pgTable("long_form", (t) => ({
 
     //change id generation to uuid
     id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
-
     firstName: t.text().notNull(),
     lastName: t.text(),
-    dateOfBirth: t.date().notNull(),
+    dateOfBirth: t.date({ mode: "string" }).notNull(),
     gender: t.text().notNull(),
-
-    phoneNumber: t.varchar({ length: 10 }).notNull(),
+    phoneNumber: encryptedText().notNull(),
     email: t.text(),
-
-    aadhar: t.text().notNull(),
-    pan: t.text().notNull(),
+    aadhar: encryptedText().notNull(),
+    pan: encryptedText().notNull(),
     maritalStatus: maritalStatusEnum().notNull(),
-
+    //relation
     relation: t.text().notNull(),
     relativeFirstName: t.text().notNull(),
     relativeLastName: t.text(),
-
     //address
     address: t.text().notNull(),
     pincode: t.text().notNull(),
@@ -30,29 +27,26 @@ export const longFormTable = pgTable("long_form", (t) => ({
     block: t.text().notNull(),
     district: t.text().notNull(),
     state: t.text().notNull(),
-
-
+    //loan details
     purposeOfLoan: t.text().notNull(),
-    loanAmount: t.numeric().notNull(),
+    loanAmount: t.doublePrecision().notNull(),
     sourceOfIncome: t.text().notNull(),
-    monthlyIncome: t.numeric().notNull(),
+    monthlyIncome: t.doublePrecision().notNull(),
     jobProfile: t.text().notNull(),
-
-
-
-
     status: applicationStatusEnum().notNull().default("PENDING"),
-
-
-    createdAt: t.timestamp({ mode: "date", withTimezone: true })
+    //reason for update
+    reason: t.text(),
+    createdAt: t.timestamp({ mode: "string", withTimezone: true })
         .notNull()
         .defaultNow(),
-
-
-
     //utm fields
     utmMedium: t.text(),
     utmSource: t.text(),
     utmContent: t.text(),
     utmCampaign: t.text(),
+    //employee details
+    employeeId: t.text(),
+    employeeName: t.text(),
+    applicationNumber: t.text(),
+    loanAccountNumber: t.text(),
 }));

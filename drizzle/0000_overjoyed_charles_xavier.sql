@@ -8,7 +8,7 @@ CREATE TABLE "long_form" (
 	"last_name" text,
 	"date_of_birth" date NOT NULL,
 	"gender" text NOT NULL,
-	"phone_number" varchar(10) NOT NULL,
+	"phone_number" text NOT NULL,
 	"email" text,
 	"aadhar" text NOT NULL,
 	"pan" text NOT NULL,
@@ -23,22 +23,27 @@ CREATE TABLE "long_form" (
 	"district" text NOT NULL,
 	"state" text NOT NULL,
 	"purpose_of_loan" text NOT NULL,
-	"loan_amount" numeric NOT NULL,
+	"loan_amount" double precision NOT NULL,
 	"source_of_income" text NOT NULL,
-	"monthly_income" numeric NOT NULL,
+	"monthly_income" double precision NOT NULL,
 	"job_profile" text NOT NULL,
 	"status" "application_status" DEFAULT 'PENDING' NOT NULL,
+	"reason" text,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"utm_medium" text,
 	"utm_source" text,
 	"utm_content" text,
-	"utm_campaign" text
+	"utm_campaign" text,
+	"employee_id" text,
+	"employee_name" text,
+	"application_number" text,
+	"loan_account_number" text
 );
 --> statement-breakpoint
 CREATE TABLE "short_form" (
 	"id" integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY (sequence name "short_form_id_seq" INCREMENT BY 1 MINVALUE 1 MAXVALUE 2147483647 START WITH 1 CACHE 1),
 	"name" varchar(255) NOT NULL,
-	"phone_number" varchar(10) NOT NULL,
+	"phone_number" text NOT NULL,
 	"email" text,
 	"city" varchar(255) NOT NULL,
 	"loan_amount" numeric,
@@ -51,6 +56,9 @@ CREATE TABLE "short_form" (
 	"utm_source" text,
 	"utm_content" text,
 	"utm_campaign" text,
+	"is_active" boolean DEFAULT true NOT NULL,
 	"status" "enquiry_status" DEFAULT 'PENDING' NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"employee_name" text,
+	"updated_at" timestamp with time zone
 );

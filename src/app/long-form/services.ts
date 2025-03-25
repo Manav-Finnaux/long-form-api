@@ -3,7 +3,7 @@ import { shortFormTable } from "@/db/schemas/short-form"
 import ApiError from "@/lib/error-handler"
 import { compareHash, generateOtp, getHashedValue } from "@/utils"
 import axios from "axios"
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 
 const sendOtp = async (phoneNumber: string, otp?: string) => {
   const key = process.env.SMI_API_KEY
@@ -32,7 +32,6 @@ export async function saveBasicInfoService(data: any) {
     await tx.update(shortFormTable).set({ isActive: false }).where(eq(shortFormTable.phoneNumber, data.phoneNumber))
 
     const rows = await tx.insert(shortFormTable).values(data).returning({ id: shortFormTable.id })
-
     return { rows }
   })
 
@@ -47,7 +46,7 @@ export async function updateBasicInfoService(id: any, data: any) {
   await db
     .update(shortFormTable)
     .set(data)
-    .where(and(eq(shortFormTable.isActive, true), eq(shortFormTable.id, id)))
+    .where(eq(shortFormTable.id, id))
 
   return { message: "User updated", data: null }
 

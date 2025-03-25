@@ -4,7 +4,12 @@ import {
   updateBasicInfoService,
   verifyMobileOtpService
 } from "@/app/short-form/services"
+import { db } from "@/db"
+import { ENQUIRY_STATUS_VALUES } from "@/db/schemas/enums"
+import { shortFormTable } from "@/db/schemas/short-form"
+import yup from "@/lib/yup"
 import { yupValidator } from "@/lib/yup/validator"
+import { and, desc, eq, gte, lte, SQLWrapper } from "drizzle-orm"
 import { Hono } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
 import { createMiddleware } from "hono/factory"
@@ -58,6 +63,7 @@ const app = new Hono<{
     }
     let result = null;
 
+
     if (existingUserId) {
       result = await updateBasicInfoService(existingUserId, c.req.valid("json"))
     }
@@ -82,14 +88,12 @@ const app = new Hono<{
     return c.json(result, HttpStatus.OK)
   })
   //all the routes below this middleware will have access to the id
-  .use(verifyJwt)
-  .put("/send-otp", async (c) => {
+  .put("/send-otp", verifyJwt, async (c) => {
     const id = c.get("id")
     const result = await sendMobileOtpService(id)
     return c.json(result, HttpStatus.OK)
   })
-  .put(
-    "/verify-otp",
+  .put("/verify-otp", verifyJwt,
     yupValidator("json", verifyPhoneOtpSchema),
     async (c) => {
       const data = c.req.valid("json")
@@ -98,5 +102,55 @@ const app = new Hono<{
       return c.json(result, HttpStatus.OK)
     },
   )
+  //put behind auth middleware
+  .get("/",
+    yupValidator("query", yup.object({
+      from: yup.string().notRequired().trim().datetime(),
+      to: yup.string().notRequired().trim().datetime(),
+      status: yup.string().notRequired().oneOf(ENQUIRY_STATUS_VALUES)
+    })), async (c) => {
+      const { from, to, status } = c.req.valid("query")
+
+      const filters: SQLWrapper[] = []
+
+      if (from) {
+        filters.push(gte(shortFormTable.createdAt, from))
+      }
+      if (to) {
+        filters.push(lte(shortFormTable.createdAt, to))
+      }
+
+      if (status) {
+        filters.push(eq(shortFormTable.status, status))
+      }
+
+
+      const result = await db
+        .select()
+        .from(shortFormTable)
+        .where(
+          and(
+            eq(shortFormTable.isActive, true),
+            ...filters
+          )
+
+        )
+        .orderBy(desc(shortFormTable.createdAt))
+
+
+      return c.json({ message: "Data fetched successfully!", data: result }, HttpStatus.OK)
+
+    })
+  .put("/:id",
+    yupValidator("param", yup.object({ id: yup.number().required() })),
+    yupValidator("json", yup.object({ employeeName: yup.string().required().trim(), status: yup.string().required().oneOf(ENQUIRY_STATUS_VALUES) }))
+    , async (c) => {
+      const { id } = c.req.valid("param")
+      const data = c.req.valid("json")
+      const result = await updateBasicInfoService(id, data)
+
+      return c.json(result, HttpStatus.OK)
+    })
+
 
 export { app as shortForm }

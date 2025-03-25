@@ -2,6 +2,7 @@ import ApiError from "@/lib/error-handler"
 import { serve } from "@hono/node-server"
 import { Hono } from "hono"
 import httpStatus from "http-status"
+import { longForm } from "./app/long-form"
 import { shortForm } from "./app/short-form"
 
 const app = new Hono()
@@ -10,7 +11,7 @@ app.get("/", (c) => {
   return c.json({ message: "Hello from server!", data: null })
 })
 
-app.basePath("/api").route('/short-form', shortForm)
+app.basePath("/api").route('/short-form', shortForm).route('/long-form', longForm)
 
 
 app.onError((err, c) => {
@@ -20,7 +21,7 @@ app.onError((err, c) => {
     return c.json({ message: err.message, data: null }, err.statusCode)
   }
   return c.json(
-    { message: "You are dead.", data: null },
+    { message: "Internal Server Error", data: null },
     httpStatus.INTERNAL_SERVER_ERROR,
   )
 })

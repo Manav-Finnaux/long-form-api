@@ -1,5 +1,5 @@
 {
-  "id": "86c0e28a-3a16-40ab-8cca-96b48f125e40",
+  "id": "e7a34f5e-70fa-49e7-8e57-14ed93e3d165",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -51,7 +51,7 @@
         },
         "phone_number": {
           "name": "phone_number",
-          "type": "varchar(10)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -142,7 +142,7 @@
         },
         "loan_amount": {
           "name": "loan_amount",
-          "type": "numeric",
+          "type": "double precision",
           "primaryKey": false,
           "notNull": true
         },
@@ -154,7 +154,7 @@
         },
         "monthly_income": {
           "name": "monthly_income",
-          "type": "numeric",
+          "type": "double precision",
           "primaryKey": false,
           "notNull": true
         },
@@ -171,6 +171,12 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'PENDING'"
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -199,6 +205,30 @@
         },
         "utm_campaign": {
           "name": "utm_campaign",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "employee_id": {
+          "name": "employee_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "employee_name": {
+          "name": "employee_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "application_number": {
+          "name": "application_number",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loan_account_number": {
+          "name": "loan_account_number",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -241,7 +271,7 @@
         },
         "phone_number": {
           "name": "phone_number",
-          "type": "varchar(10)",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },
@@ -320,6 +350,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
         "status": {
           "name": "status",
           "type": "enquiry_status",
@@ -334,6 +371,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "employee_name": {
+          "name": "employee_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
