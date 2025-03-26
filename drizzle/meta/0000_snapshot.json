@@ -1,5 +1,5 @@
 {
-  "id": "e7a34f5e-70fa-49e7-8e57-14ed93e3d165",
+  "id": "c244559f-3b23-4f26-95e0-b65a10414420",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -37,8 +37,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "date_of_birth": {
-          "name": "date_of_birth",
+        "dob": {
+          "name": "dob",
           "type": "date",
           "primaryKey": false,
           "notNull": true
@@ -49,8 +49,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "phone_number": {
-          "name": "phone_number",
+        "mobile_no": {
+          "name": "mobile_no",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -61,20 +61,20 @@
           "primaryKey": false,
           "notNull": false
         },
-        "aadhar": {
-          "name": "aadhar",
+        "aadhar_no": {
+          "name": "aadhar_no",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "pan": {
-          "name": "pan",
+        "pan_no": {
+          "name": "pan_no",
           "type": "text",
           "primaryKey": false,
           "notNull": true
         },
-        "marital_status": {
-          "name": "marital_status",
+        "m_status": {
+          "name": "m_status",
           "type": "marital_status",
           "typeSchema": "public",
           "primaryKey": false,
@@ -104,8 +104,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "pincode": {
-          "name": "pincode",
+        "pin_code": {
+          "name": "pin_code",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -116,8 +116,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "block": {
-          "name": "block",
+        "city": {
+          "name": "city",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -140,8 +140,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "loan_amount": {
-          "name": "loan_amount",
+        "loan_required": {
+          "name": "loan_required",
           "type": "double precision",
           "primaryKey": false,
           "notNull": true
@@ -185,6 +185,12 @@
           "notNull": true,
           "default": "now()"
         },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "utm_medium": {
           "name": "utm_medium",
           "type": "text",
@@ -221,14 +227,14 @@
           "primaryKey": false,
           "notNull": false
         },
-        "application_number": {
-          "name": "application_number",
+        "application_no": {
+          "name": "application_no",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "loan_account_number": {
-          "name": "loan_account_number",
+        "loan_no": {
+          "name": "loan_no",
           "type": "text",
           "primaryKey": false,
           "notNull": false

@@ -97,7 +97,7 @@ const app = new Hono()
     yupValidator("json", yup.object({
       employeeId: yup.string().notRequired().trim(),
       employeeName: yup.string().notRequired().trim(),
-      loanAccountNumber: yup.string().notRequired().trim(),
+      loanNo: yup.string().notRequired().trim(),
       applicationNumber: yup.string().notRequired().trim(),
       status: yup.string().optional().oneOf(APPLICATION_STATUS_VALUES),
       reason: yup.string().notRequired().trim(),
