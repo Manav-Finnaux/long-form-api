@@ -19,10 +19,10 @@ const app = new Hono()
   .post("/", yupValidator("json", longFormSchema), async (c) => {
     const data = c.req.valid("json")
 
-    const { aadhar, pan, phoneNumber } = data
+    const { aadharNo, panNo, mobileNo } = data
 
     const existingRows = await db.select({ createdAt: longFormTable.createdAt, status: longFormTable.status }).from(longFormTable).where(
-      or(eq(longFormTable.aadhar, aadhar), eq(longFormTable.pan, pan)),
+      or(eq(longFormTable.aadharNo, aadharNo), eq(longFormTable.panNo, panNo)),
     ).orderBy(desc(longFormTable.createdAt)).limit(1)
 
     if (existingRows.length > 0) {
@@ -45,7 +45,7 @@ const app = new Hono()
 
 
     await db.transaction(async (tx) => {
-      await tx.update(shortFormTable).set({ isActive: false }).where(eq(shortFormTable.phoneNumber, phoneNumber))
+      await tx.update(shortFormTable).set({ isActive: false }).where(eq(shortFormTable.phoneNumber, mobileNo))
 
       await tx.insert(longFormTable).values({
         ...data,
