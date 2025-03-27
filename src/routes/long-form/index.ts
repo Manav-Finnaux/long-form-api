@@ -5,6 +5,7 @@ import { shortFormTable } from "@/db/schemas/short-form"
 import ApiError from "@/lib/error-handler"
 import yup from "@/lib/yup"
 import { yupValidator } from "@/lib/yup/validator"
+import { verifyAuthorizationHeader } from "@/middlewares"
 import { differenceInDays } from "date-fns"
 import { and, desc, eq, gte, lte, or, SQLWrapper } from "drizzle-orm"
 import { Hono } from "hono"
@@ -12,6 +13,8 @@ import HttpStatus from "http-status"
 import {
   longFormSchema
 } from "./schema"
+
+
 
 
 
@@ -55,6 +58,7 @@ const app = new Hono()
 
     return c.json({ message: "Application submitted successfully", })
   })
+  .use(verifyAuthorizationHeader)
   .get("/",
     yupValidator("query", yup.object({
       from: yup.string().notRequired().trim().datetime(),

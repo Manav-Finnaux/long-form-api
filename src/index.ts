@@ -1,11 +1,16 @@
-import ApiError from "@/lib/error-handler"
-import { serve } from "@hono/node-server"
-import { Hono } from "hono"
-import httpStatus from "http-status"
-import { longForm } from "./app/long-form"
-import { shortForm } from "./app/short-form"
+import 'dotenv/config';
+
+
+import ApiError from "@/lib/error-handler";
+import { serve } from "@hono/node-server";
+import { Hono } from "hono";
+import httpStatus from "http-status";
+import { env } from "./env";
+import { longForm } from "./routes/long-form";
+import { shortForm } from "./routes/short-form";
 
 const app = new Hono()
+const PORT = env.PORT
 
 app.get("/", (c) => {
   return c.json({ message: "Hello from server!", data: null })
@@ -31,9 +36,9 @@ app.notFound((c) => {
 })
 
 
-console.log(`Server is running on http://localhost:${process.env.PORT}`)
+console.log(`Server is running on http://localhost:${PORT}`)
 
 serve({
   fetch: app.fetch,
-  port: parseInt(process.env.PORT!),
+  port: PORT,
 })

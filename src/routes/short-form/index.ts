@@ -1,14 +1,16 @@
+import { db } from "@/db"
+import { ENQUIRY_STATUS_VALUES } from "@/db/schemas/enums"
+import { shortFormTable } from "@/db/schemas/short-form"
+import { env } from "@/env"
+import yup from "@/lib/yup"
+import { yupValidator } from "@/lib/yup/validator"
+import { verifyAuthorizationHeader } from "@/middlewares"
 import {
   saveBasicInfoService,
   sendMobileOtpService,
   updateBasicInfoService,
   verifyMobileOtpService
-} from "@/app/short-form/services"
-import { db } from "@/db"
-import { ENQUIRY_STATUS_VALUES } from "@/db/schemas/enums"
-import { shortFormTable } from "@/db/schemas/short-form"
-import yup from "@/lib/yup"
-import { yupValidator } from "@/lib/yup/validator"
+} from "@/routes/short-form/services"
 import { and, desc, eq, gte, lte, SQLWrapper } from "drizzle-orm"
 import { Hono } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
@@ -33,7 +35,7 @@ const verifyJwt = createMiddleware(async (c, next) => {
   }
 
   try {
-    const decoded = await verify(jwt, process.env.ANONYMOUS_CUSTOMER_JWT_SECRET!)
+    const decoded = await verify(jwt, env.ANONYMOUS_CUSTOMER_JWT_SECRET!)
 
     c.set("id", decoded.id)
   } catch (error) {
@@ -57,7 +59,7 @@ const app = new Hono<{
     let existingUserId = null;
     if (existingSession) {
       try {
-        const decoded = await verify(existingSession, process.env.ANONYMOUS_CUSTOMER_JWT_SECRET!)
+        const decoded = await verify(existingSession, env.ANONYMOUS_CUSTOMER_JWT_SECRET)
         existingUserId = decoded.id as string
       } catch (err) { }
     }
@@ -74,7 +76,7 @@ const app = new Hono<{
 
       const jwt = await sign(
         { id: result.data.row.id },
-        process.env.ANONYMOUS_CUSTOMER_JWT_SECRET!,
+        env.ANONYMOUS_CUSTOMER_JWT_SECRET,
       )
 
       setCookie(c, COOKIE_NAME, jwt, {
@@ -103,6 +105,7 @@ const app = new Hono<{
     },
   )
   //put behind auth middleware
+  .use(verifyAuthorizationHeader)
   .get("/",
     yupValidator("query", yup.object({
       from: yup.string().notRequired().trim().datetime(),
