@@ -13,6 +13,7 @@ import {
 } from "@/routes/short-form/services"
 import { and, desc, eq, gte, lte, SQLWrapper } from "drizzle-orm"
 import { Hono } from "hono"
+import { rateLimiter } from "hono-rate-limiter"
 import { getCookie, setCookie } from "hono/cookie"
 import { createMiddleware } from "hono/factory"
 import { sign, verify } from "hono/jwt"
@@ -47,12 +48,15 @@ const verifyJwt = createMiddleware(async (c, next) => {
   await next()
 })
 
+
+type Variables = {
+  id: string
+}
+
 const app = new Hono<{
-  Variables: {
-    id: string
-  }
+  Variables: Variables,
 }>()
-  .post("/basic-info", yupValidator("json", basicInfoSchema), async (c) => {
+  .post("/", yupValidator("json", basicInfoSchema), async (c) => {
 
     const existingSession = getCookie(c, COOKIE_NAME)
 
@@ -80,21 +84,33 @@ const app = new Hono<{
       )
 
       setCookie(c, COOKIE_NAME, jwt, {
-        secure: true,
+        secure: false,
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "lax",
       })
-
     }
 
     return c.json(result, HttpStatus.OK)
   })
   //all the routes below this middleware will have access to the id
-  .put("/send-otp", verifyJwt, async (c) => {
-    const id = c.get("id")
-    const result = await sendMobileOtpService(id)
-    return c.json(result, HttpStatus.OK)
-  })
+  .put("/send-otp",
+    verifyJwt,
+    rateLimiter<{
+      Variables: Variables,
+    }>({
+      handler: (c) => c.json({ message: HttpStatus[429], data: null }, 429),
+      windowMs: 1000 * 60,
+      limit: 5,
+      standardHeaders: "draft-6",
+      keyGenerator: (c) => {
+        return c.get("id")
+      },
+    }),
+    async (c) => {
+      const id = c.get("id")
+      const result = await sendMobileOtpService(id)
+      return c.json(result, HttpStatus.OK)
+    })
   .put("/verify-otp", verifyJwt,
     yupValidator("json", verifyPhoneOtpSchema),
     async (c) => {

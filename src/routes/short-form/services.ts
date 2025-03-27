@@ -44,9 +44,13 @@ export async function saveBasicInfoService(data: any) {
 
 export async function updateBasicInfoService(id: any, data: any) {
 
+  const row = await db.select({ phoneNumber: shortFormTable.phoneNumber, isOtpVerified: shortFormTable.isOtpVerified }).from(shortFormTable).where(eq(shortFormTable.id, id))
   await db
     .update(shortFormTable)
-    .set(data)
+    .set({
+      ...data,
+      isOtpVerified: row[0]?.phoneNumber === data.phoneNumber ? row[0]?.isOtpVerified : false
+    })
     .where(and(eq(shortFormTable.isActive, true), eq(shortFormTable.id, id)))
 
   return { message: "User updated", data: null }
@@ -84,7 +88,7 @@ export async function verifyMobileOtpService(id: any, data: any) {
   const row = rows[0]
 
   if (!row.hashedOtp) {
-    throw new Error("User not found")
+    throw new ApiError(404, "User not found")
   }
 
   const isMatch = await compareHash(data.otp, row.hashedOtp)

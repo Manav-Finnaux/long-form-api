@@ -9,6 +9,7 @@ const envSchema = yup.object({
     ANONYMOUS_CUSTOMER_JWT_SECRET: yup.string().trim().required(),
     ENCRYPTION_KEY: yup.string().trim().required(),
     API_AUTHORIZATION_HEADER_SECRET: yup.string().trim().required(),
+    CORS_LIST: yup.string().required().trim()
 })
 
 //For node js and bun js runtime

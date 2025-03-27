@@ -9,10 +9,10 @@ export const basicInfoSchema = yup.object({
     wantWhatsappUpdates: yup.boolean().required().default(false),
     loanAmount: yup.number().min(0).required(),
 
-    utmMedium: yup.string().trim(),
-    utmSource: yup.string().trim(),
-    utmContent: yup.string().trim(),
-    utmCampaign: yup.string().trim(),
+    utmMedium: yup.string().notRequired().trim(),
+    utmSource: yup.string().notRequired().trim(),
+    utmContent: yup.string().notRequired().trim(),
+    utmCampaign: yup.string().notRequired().trim(),
 })
 
 export const verifyPhoneOtpSchema = yup.object({
