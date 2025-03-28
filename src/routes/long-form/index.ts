@@ -80,6 +80,8 @@ const app = new Hono()
         filters.push(eq(longFormTable.status, status))
       }
 
+      console.log(filters)
+
 
       const result = await db
         .select()
@@ -102,7 +104,7 @@ const app = new Hono()
       employeeId: yup.string().notRequired().trim(),
       employeeName: yup.string().notRequired().trim(),
       loanNo: yup.string().notRequired().trim(),
-      applicationNumber: yup.string().notRequired().trim(),
+      applicationNo: yup.string().notRequired().trim(),
       status: yup.string().optional().oneOf(APPLICATION_STATUS_VALUES),
       reason: yup.string().notRequired().trim(),
     }))

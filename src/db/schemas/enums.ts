@@ -16,7 +16,7 @@ export const {
     pgEnum: applicationStatusEnum
 } = createEnum({
     name: "applicationStatus",
-    values: ["PENDING", "IN_PROGRESS", "REJECTED", "COMPLETED", "CLOSED"]
+    values: ["PENDING", "IN_PROGRESS", "REJECTED", "COMPLETED", "CLOSED", "HOLD"]
 })
 
 export const {
