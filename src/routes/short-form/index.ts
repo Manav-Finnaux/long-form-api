@@ -103,7 +103,7 @@ const app = new Hono<{
       limit: 5,
       standardHeaders: "draft-6",
       keyGenerator: (c) => {
-        return c.get("id")
+        return "long-form-" + c.get("id")
       },
     }),
     async (c) => {
