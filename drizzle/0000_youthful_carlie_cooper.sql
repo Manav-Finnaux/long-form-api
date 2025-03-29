@@ -1,5 +1,5 @@
-CREATE TYPE "public"."application_status" AS ENUM('PENDING', 'IN_PROGRESS', 'REJECTED', 'COMPLETED', 'CLOSED');--> statement-breakpoint
-CREATE TYPE "public"."enquiry_status" AS ENUM('PENDING', 'REJECTED', 'APPROVED');--> statement-breakpoint
+CREATE TYPE "public"."application_status" AS ENUM('PENDING', 'IN_PROGRESS', 'REJECTED', 'COMPLETED', 'CLOSED', 'HOLD');--> statement-breakpoint
+CREATE TYPE "public"."enquiry_status" AS ENUM('PENDING', 'CALLED', 'PROCESSED');--> statement-breakpoint
 CREATE TYPE "public"."gender" AS ENUM('MALE', 'FEMALE', 'OTHER');--> statement-breakpoint
 CREATE TYPE "public"."marital_status" AS ENUM('MARRIED', 'SINGLE', 'DIVORCED', 'WIDOWED', 'SEPARATED');--> statement-breakpoint
 CREATE TABLE "long_form" (
@@ -61,5 +61,6 @@ CREATE TABLE "short_form" (
 	"status" "enquiry_status" DEFAULT 'PENDING' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"employee_name" text,
+	"remarks" text,
 	"updated_at" timestamp with time zone
 );

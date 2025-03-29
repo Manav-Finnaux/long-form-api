@@ -44,11 +44,11 @@ const app = new Hono()
       }
     }
 
-
-
-
     await db.transaction(async (tx) => {
-      await tx.update(shortFormTable).set({ isActive: false }).where(eq(shortFormTable.phoneNumber, mobileNo))
+      await tx.update(shortFormTable).set({ isActive: false }).where(and(
+        eq(shortFormTable.phoneNumber, mobileNo),
+        eq(shortFormTable.status, "PENDING"),
+      ))
 
       await tx.insert(longFormTable).values({
         ...data,
@@ -79,9 +79,6 @@ const app = new Hono()
       if (status) {
         filters.push(eq(longFormTable.status, status))
       }
-
-      console.log(filters)
-
 
       const result = await db
         .select()

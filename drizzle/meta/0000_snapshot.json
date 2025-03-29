@@ -1,5 +1,5 @@
 {
-  "id": "c244559f-3b23-4f26-95e0-b65a10414420",
+  "id": "fc531db1-8507-498e-9c95-7f4215e7445d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -384,6 +384,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "remarks": {
+          "name": "remarks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp with time zone",
@@ -409,7 +415,8 @@
         "IN_PROGRESS",
         "REJECTED",
         "COMPLETED",
-        "CLOSED"
+        "CLOSED",
+        "HOLD"
       ]
     },
     "public.enquiry_status": {
@@ -417,8 +424,8 @@
       "schema": "public",
       "values": [
         "PENDING",
-        "REJECTED",
-        "APPROVED"
+        "CALLED",
+        "PROCESSED"
       ]
     },
     "public.gender": {

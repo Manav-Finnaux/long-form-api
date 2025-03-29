@@ -57,7 +57,6 @@ const app = new Hono<{
   Variables: Variables,
 }>()
   .post("/", yupValidator("json", basicInfoSchema), async (c) => {
-
     const existingSession = getCookie(c, COOKIE_NAME)
 
     let existingUserId = null;
@@ -123,6 +122,7 @@ const app = new Hono<{
   //put behind auth middleware
   .use(verifyAuthorizationHeader)
   .get("/",
+    verifyAuthorizationHeader,
     yupValidator("query", yup.object({
       from: yup.string().notRequired().trim().datetime(),
       to: yup.string().notRequired().trim().datetime(),
@@ -162,7 +162,11 @@ const app = new Hono<{
     })
   .put("/:id",
     yupValidator("param", yup.object({ id: yup.number().required() })),
-    yupValidator("json", yup.object({ employeeName: yup.string().required().trim(), status: yup.string().required().oneOf(ENQUIRY_STATUS_VALUES) }))
+    yupValidator("json", yup.object({
+      remarks: yup.string().notRequired().trim(),
+      employeeName: yup.string().required().trim(),
+      status: yup.string().required().oneOf(ENQUIRY_STATUS_VALUES)
+    }))
     , async (c) => {
       const { id } = c.req.valid("param")
       const data = c.req.valid("json")

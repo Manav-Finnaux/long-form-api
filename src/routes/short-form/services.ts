@@ -29,7 +29,13 @@ export async function saveBasicInfoService(data: any) {
 
   const { rows } = await db.transaction(async (tx) => {
 
-    await tx.update(shortFormTable).set({ isActive: false }).where(eq(shortFormTable.phoneNumber, data.phoneNumber))
+    await tx.update(shortFormTable).set({ isActive: false })
+      .where(
+        and(
+          eq(shortFormTable.phoneNumber, data.phoneNumber),
+          eq(shortFormTable.status, "PENDING"),
+        )
+      )
 
     const rows = await tx.insert(shortFormTable).values(data).returning({ id: shortFormTable.id })
 

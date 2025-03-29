@@ -37,7 +37,9 @@ app.get("/", (c) => {
   return c.json({ message: "Hello from server!", data: null })
 })
 
-app.basePath("/api").route('/short-form', shortForm).route('/long-form', longForm)
+app.basePath("/api")
+  .route('/short-form', shortForm)
+  .route('/long-form', longForm)
 
 
 app.onError((err, c) => {

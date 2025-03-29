@@ -28,5 +28,6 @@ export const shortFormTable = pgTable("short_form", (t) => ({
         .notNull()
         .defaultNow(),
     employeeName: t.text(),
+    remarks: t.text(),
     updatedAt: t.timestamp({ mode: "string", withTimezone: true }).$onUpdateFn(() => sql`now()`),
 }));

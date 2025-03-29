@@ -7,7 +7,7 @@ export const {
     pgEnum: enquiryStatusEnum
 } = createEnum({
     name: "enquiryStatus",
-    values: ["PENDING", "REJECTED", "APPROVED"]
+    values: ["PENDING", "CALLED", "PROCESSED"]
 })
 
 export const {
