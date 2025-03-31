@@ -1,18 +1,10 @@
 import { db } from "@/db"
 import { shortFormTable } from "@/db/schemas/short-form"
 import ApiError from "@/lib/error-handler"
-import { sendOtp } from "@/services"
-import { compareHash, generateOtp, getHashedValue } from "@/utils"
+import { saveOtp, sendOtp, verifyOtp, } from "@/services"
+import { generateOtp } from "@/utils"
 import { and, eq } from "drizzle-orm"
 
-
-
-const getOtpService = async (phoneNumber: string) => {
-  const otp = generateOtp()
-  await sendOtp(phoneNumber, otp);
-  const hashedOtp = await getHashedValue(otp)
-  return hashedOtp
-}
 
 
 export async function saveBasicInfoService(data: any) {
@@ -63,36 +55,25 @@ export async function sendMobileOtpService(id: any) {
     throw new ApiError(404, "User not found")
   }
 
-  const hashedOtp = await getOtpService(row.phoneNumber)
-
-  await db
-    .update(shortFormTable)
-    .set({ otp: hashedOtp })
-    .where(eq(shortFormTable.id, id))
+  const otp = generateOtp()
+  await sendOtp(row.phoneNumber, otp)
+  await saveOtp(row.phoneNumber, otp, new Date(Date.now() + 2 * 60 * 1000))
 
   return { message: "OTP Sent!", data: null }
 }
 
 
 export async function verifyMobileOtpService(id: any, data: any) {
-
-  const rows = await db
-    .select({ hashedOtp: shortFormTable.otp })
+  const [row] = await db
+    .select({ phoneNumber: shortFormTable.phoneNumber })
     .from(shortFormTable)
     .where(eq(shortFormTable.id, id))
 
-  const row = rows[0]
 
-  if (!row.hashedOtp) {
-    throw new ApiError(404, "User not found")
-  }
-
-  const isMatch = await compareHash(data.otp, row.hashedOtp)
-  if (!isMatch) throw new ApiError(400, "Invalid OTP")
-
+  await verifyOtp(data.otp, row.phoneNumber)
   await db
     .update(shortFormTable)
-    .set({ otp: null, isOtpVerified: true })
+    .set({ isOtpVerified: true })
     .where(eq(shortFormTable.id, id))
 
   return { message: "OTP verified", data: null }
