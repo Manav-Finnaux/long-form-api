@@ -1,0 +1,1 @@
+ALTER TABLE "sms_config" ADD COLUMN "id" boolean PRIMARY KEY DEFAULT true NOT NULL;

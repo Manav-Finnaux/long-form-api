@@ -45,7 +45,8 @@ const app = new Hono()
     }
 
     await db.transaction(async (tx) => {
-      await tx.update(shortFormTable).set({ isActive: false }).where(and(
+      await tx.update(shortFormTable).set({ status: "PROCESSED" }).where(and(
+        eq(shortFormTable.isActive, true),
         eq(shortFormTable.phoneNumber, mobileNo),
         eq(shortFormTable.status, "PENDING"),
       ))

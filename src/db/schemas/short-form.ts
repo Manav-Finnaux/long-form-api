@@ -22,12 +22,15 @@ export const shortFormTable = pgTable("short_form", (t) => ({
     utmSource: t.text(),
     utmContent: t.text(),
     utmCampaign: t.text(),
+
     isActive: t.boolean().notNull().default(true),
     status: enquiryStatusEnum().notNull().default("PENDING"),
     createdAt: t.timestamp({ mode: "string", withTimezone: true })
         .notNull()
         .defaultNow(),
     employeeName: t.text(),
+    employeeId: t.text(),
+
     remarks: t.text(),
     updatedAt: t.timestamp({ mode: "string", withTimezone: true }).$onUpdateFn(() => sql`now()`),
 }));

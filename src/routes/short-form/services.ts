@@ -1,25 +1,15 @@
 import { db } from "@/db"
 import { shortFormTable } from "@/db/schemas/short-form"
 import ApiError from "@/lib/error-handler"
+import { sendOtp } from "@/services"
 import { compareHash, generateOtp, getHashedValue } from "@/utils"
-import axios from "axios"
 import { and, eq } from "drizzle-orm"
 
-const sendOtp = async (phoneNumber: string, otp?: string) => {
-  const key = process.env.SMI_API_KEY
-  const route = 1
-  const senderId = process.env.SMS_API_SENDER_ID
-  const sms = `${otp} is your OTP for Finnaux Login. Never disclose this OTP with anybody else. MSFIN Credit Pvt Ltd`
-  const templateId = "1407170970390002027"
-  const url = `http://sms.par-ken.com/api/smsapi?key=${key}&route=${route}&sender=${senderId}&number=${phoneNumber}(s)&sms=${sms}&templateid=${templateId}`
 
-  axios.get(url);
-}
 
 const getOtpService = async (phoneNumber: string) => {
   const otp = generateOtp()
-  // sendOtp(phoneNumber, otp);
-  console.log(otp)
+  await sendOtp(phoneNumber, otp);
   const hashedOtp = await getHashedValue(otp)
   return hashedOtp
 }

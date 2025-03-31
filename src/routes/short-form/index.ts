@@ -11,6 +11,7 @@ import {
   updateBasicInfoService,
   verifyMobileOtpService
 } from "@/routes/short-form/services"
+import { canSendOtp } from "@/services"
 import { and, desc, eq, gte, lte, SQLWrapper } from "drizzle-orm"
 import { Hono } from "hono"
 import { rateLimiter } from "hono-rate-limiter"
@@ -87,9 +88,12 @@ const app = new Hono<{
         httpOnly: true,
         sameSite: "lax",
       })
+
     }
 
-    return c.json(result, HttpStatus.OK)
+    const sendOtp = await canSendOtp();
+
+    return c.json({ ...result, data: { ...result.data, sendOtp } }, HttpStatus.OK)
   })
   //all the routes below this middleware will have access to the id
   .put("/send-otp",
@@ -102,7 +106,7 @@ const app = new Hono<{
       limit: 5,
       standardHeaders: "draft-6",
       keyGenerator: (c) => {
-        return "long-form-" + c.get("id")
+        return "short-form-" + c.get("id")
       },
     }),
     async (c) => {
@@ -164,8 +168,9 @@ const app = new Hono<{
     yupValidator("param", yup.object({ id: yup.number().required() })),
     yupValidator("json", yup.object({
       remarks: yup.string().notRequired().trim(),
-      employeeName: yup.string().required().trim(),
-      status: yup.string().required().oneOf(ENQUIRY_STATUS_VALUES)
+      employeeName: yup.string().notRequired().trim(),
+      employeeId: yup.string().notRequired().trim(),
+      status: yup.string().notRequired().oneOf(ENQUIRY_STATUS_VALUES)
     }))
     , async (c) => {
       const { id } = c.req.valid("param")
