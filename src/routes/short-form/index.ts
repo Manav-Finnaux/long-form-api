@@ -84,7 +84,7 @@ const app = new Hono<{
       )
 
       setCookie(c, COOKIE_NAME, jwt, {
-        secure: false,
+        secure: true,
         httpOnly: true,
         sameSite: "lax",
       })

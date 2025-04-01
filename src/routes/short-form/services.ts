@@ -57,7 +57,7 @@ export async function sendMobileOtpService(id: any) {
 
   const otp = generateOtp()
   await sendOtp(row.phoneNumber, otp)
-  await saveOtp(row.phoneNumber, otp, new Date(Date.now() + 2 * 60 * 1000))
+  await saveOtp(row.phoneNumber, otp, new Date(Date.now() + 5 * 60 * 1000))
 
   return { message: "OTP Sent!", data: null }
 }

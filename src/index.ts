@@ -12,6 +12,7 @@ import httpStatus from "http-status";
 import { env } from "./env";
 import { longForm } from "./routes/long-form";
 import { shortForm } from "./routes/short-form";
+import { trackLoan } from './routes/track-loan';
 
 
 const app = new Hono()
@@ -21,7 +22,10 @@ const PORT = env.PORT
 env.NODE_ENV === "development" && app.use(logger())
 
 app.use(cors({
-  origin: env.CORS_LIST.split(','),
+  //we need this so that we serve dynamic origins without the nagging of browser
+  origin: (origin, c) => {
+    return origin;
+  },
   credentials: true,
 }))
 
@@ -44,6 +48,7 @@ app.get("/", (c) => {
 app.basePath("/api")
   .route('/short-form', shortForm)
   .route('/long-form', longForm)
+  .route('/track-loan', trackLoan)
 
 
 app.onError((err, c) => {
