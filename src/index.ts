@@ -7,6 +7,7 @@ import { getConnInfo } from '@hono/node-server/conninfo';
 import { Hono } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
 import httpStatus from "http-status";
 import { env } from "./env";
 import { longForm } from "./routes/long-form";
@@ -16,6 +17,9 @@ import { shortForm } from "./routes/short-form";
 const app = new Hono()
 const PORT = env.PORT
 
+
+env.NODE_ENV === "development" && app.use(logger())
+
 app.use(cors({
   origin: env.CORS_LIST.split(','),
   credentials: true,
@@ -24,7 +28,7 @@ app.use(cors({
 app.use(
   rateLimiter({
     handler: (c) => c.json({ message: httpStatus[429], data: null }, 429),
-    windowMs: 60 * 1000, // 10 seconds
+    windowMs: 60 * 1000, // 1 minute
     limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
     standardHeaders: "draft-6", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
     keyGenerator: (c) => {
