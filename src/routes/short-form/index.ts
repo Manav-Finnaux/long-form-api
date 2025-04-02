@@ -86,6 +86,10 @@ const app = new Hono()
       return c.json(result, HttpStatus.OK)
     })
   .put("/verify-otp",
+    jwt({
+      secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+      cookie: COOKIE_NAME,
+    }),
     yupValidator("json", verifyPhoneOtpSchema),
     async (c) => {
       const data = c.req.valid("json")
