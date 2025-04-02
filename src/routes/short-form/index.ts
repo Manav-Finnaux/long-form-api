@@ -16,8 +16,7 @@ import { and, desc, eq, gte, lte, SQLWrapper } from "drizzle-orm"
 import { Hono } from "hono"
 import { rateLimiter } from "hono-rate-limiter"
 import { getCookie, setCookie } from "hono/cookie"
-import { createMiddleware } from "hono/factory"
-import { sign, verify } from "hono/jwt"
+import { jwt, sign, verify } from "hono/jwt"
 import HttpStatus from "http-status"
 import {
   basicInfoSchema,
@@ -27,36 +26,7 @@ import {
 
 const COOKIE_NAME = "anonymous_session"
 
-const verifyJwt = createMiddleware(async (c, next) => {
-  const jwt = getCookie(c, COOKIE_NAME)
-  if (!jwt) {
-    return c.json(
-      { message: HttpStatus[401], data: null },
-      HttpStatus.UNAUTHORIZED,
-    )
-  }
-
-  try {
-    const decoded = await verify(jwt, env.ANONYMOUS_CUSTOMER_JWT_SECRET!)
-
-    c.set("id", decoded.id)
-  } catch (error) {
-    return c.json(
-      { message: HttpStatus[401], data: null },
-      HttpStatus.UNAUTHORIZED,
-    )
-  }
-  await next()
-})
-
-
-type Variables = {
-  id: string
-}
-
-const app = new Hono<{
-  Variables: Variables,
-}>()
+const app = new Hono()
   .post("/", yupValidator("json", basicInfoSchema), async (c) => {
     const existingSession = getCookie(c, COOKIE_NAME)
 
@@ -97,28 +67,29 @@ const app = new Hono<{
   })
   //all the routes below this middleware will have access to the id
   .put("/send-otp",
-    verifyJwt,
-    rateLimiter<{
-      Variables: Variables,
-    }>({
+    jwt({
+      secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+      cookie: COOKIE_NAME,
+    }),
+    rateLimiter({
       handler: (c) => c.json({ message: HttpStatus[429], data: null }, 429),
       windowMs: 1000 * 60,
       limit: 5,
       standardHeaders: "draft-6",
       keyGenerator: (c) => {
-        return "short-form-" + c.get("id")
+        return "short-form-" + c.get("jwtPayload").id
       },
     }),
     async (c) => {
-      const id = c.get("id")
+      const id = c.get("jwtPayload").id
       const result = await sendMobileOtpService(id)
       return c.json(result, HttpStatus.OK)
     })
-  .put("/verify-otp", verifyJwt,
+  .put("/verify-otp",
     yupValidator("json", verifyPhoneOtpSchema),
     async (c) => {
       const data = c.req.valid("json")
-      const id = c.get("id")
+      const id = c.get("jwtPayload").id
       const result = await verifyMobileOtpService(id, data)
       return c.json(result, HttpStatus.OK)
     },

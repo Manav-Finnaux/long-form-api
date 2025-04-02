@@ -7,6 +7,7 @@ import yup from "@/lib/yup"
 import { yupValidator } from "@/lib/yup/validator"
 import { saveOtp, sendOtp, verifyOtp } from "@/services"
 import { generateOtp } from "@/utils"
+import axios from "axios"
 import { and, eq } from "drizzle-orm"
 import { Hono } from "hono"
 import { deleteCookie, setCookie } from "hono/cookie"
@@ -16,16 +17,19 @@ import { jwt, sign } from "hono/jwt"
 const COOKIE_NAME = "track_loan_session"
 
 const app = new Hono()
-  .post("/verify-application", yupValidator("json",
-    yup.object(
-      {
-        mobileNo: yup.string().required().matches(Regex.PHONE_NUMBER),
-        applicationNo: yup.string().required(),
-      }
-    )), async (c) => {
-      const data = c.req.valid("json")
 
-      const { applicationNo, mobileNo } = data
+  .post("/verify-application/:applicationNo",
+    yupValidator("param", yup.object({ applicationNo: yup.string().required() })),
+    yupValidator("json",
+      yup.object(
+        {
+          mobileNo: yup.string().required().matches(Regex.PHONE_NUMBER),
+        }
+      ))
+
+    , async (c) => {
+      const { mobileNo } = c.req.valid("json")
+      const { applicationNo } = c.req.valid("param")
 
       const [row] = await db.select().from(longFormTable).where(
         and(
@@ -41,7 +45,7 @@ const app = new Hono()
 
 
       const otp = generateOtp()
-      await sendOtp(mobileNo, otp)
+      await sendOtp("9799790273", otp)
       await saveOtp(mobileNo, otp, new Date(Date.now() + 5 * 60 * 1000))
 
 
@@ -66,7 +70,7 @@ const app = new Hono()
     yup.object(
       {
         otp: yup.string().required(),
-        type: yup.string().required().oneOf(["STATEMENT", "CLOSURE"]),
+        type: yup.string().lowercase().required().oneOf(["statement", "closure"]),
       }
     )), async (c) => {
       const data = c.req.valid("json")
@@ -79,9 +83,18 @@ const app = new Hono()
         throw new ApiError(400, "Application not found")
       }
       await verifyOtp(data.otp, row.mobileNo)
+
+      const externalRes = await axios.post(
+        data.type === "STATEMENT" ? env.FINNAUX_APPLICATION_STATEMENT_URL : env.FINNAUX_APPLICATION_CLOSURE_URL,
+        { applicationNo: row.applicationNo }, {
+        headers: {
+          "Authorization": env.FINNAUX_AUTHORIZATION_HEADER_SECRET,
+        },
+      })
+
       deleteCookie(c, COOKIE_NAME)
 
-      return c.json({ message: "Data fetched successfully!", data: "Cat is the secret of my energy" })
+      return c.json({ message: "Data fetched successfully!", data: externalRes.data.data })
     })
 
 

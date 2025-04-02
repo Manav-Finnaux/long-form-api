@@ -9,6 +9,9 @@ const envSchema = yup.object({
     ANONYMOUS_CUSTOMER_JWT_SECRET: yup.string().trim().required(),
     ENCRYPTION_KEY: yup.string().trim().required(),
     API_AUTHORIZATION_HEADER_SECRET: yup.string().trim().required(),
+    FINNAUX_AUTHORIZATION_HEADER_SECRET: yup.string().trim().required(),
+    FINNAUX_APPLICATION_STATEMENT_URL: yup.string().trim().required().url(),
+    FINNAUX_APPLICATION_CLOSURE_URL: yup.string().trim().required().url(),
 })
 
 //For node js and bun js runtime

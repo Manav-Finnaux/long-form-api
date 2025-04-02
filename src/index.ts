@@ -7,6 +7,7 @@ import { getConnInfo } from '@hono/node-server/conninfo';
 import { Hono } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { cors } from 'hono/cors';
+import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import httpStatus from "http-status";
 import { env } from "./env";
@@ -56,6 +57,10 @@ app.onError((err, c) => {
   console.log({ err });
   if (err instanceof ApiError) {
     return c.json({ message: err.message, data: null }, err.statusCode)
+  }
+
+  if (err instanceof HTTPException) {
+    return c.json({ message: err.message, data: null }, err.status)
   }
   return c.json(
     { message: "Internal Server Error", data: null },
