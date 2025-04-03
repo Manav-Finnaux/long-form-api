@@ -1,4 +1,5 @@
 import { db } from "@/db"
+import { applicationConfigsTable } from "@/db/schemas/application-config"
 import { APPLICATION_STATUS_VALUES } from "@/db/schemas/enums"
 import { longFormTable } from "@/db/schemas/long-form"
 import { shortFormTable } from "@/db/schemas/short-form"
@@ -23,10 +24,14 @@ const app = new Hono()
     const data = c.req.valid("json")
 
     const { aadharNo, panNo, mobileNo } = data
+    const [[applicationConfigs], existingRows] = await Promise.all([
+      db.select().from(applicationConfigsTable),
 
-    const existingRows = await db.select({ createdAt: longFormTable.createdAt, status: longFormTable.status }).from(longFormTable).where(
-      or(eq(longFormTable.aadharNo, aadharNo), eq(longFormTable.panNo, panNo)),
-    ).orderBy(desc(longFormTable.createdAt)).limit(1)
+      db.select({ createdAt: longFormTable.createdAt, status: longFormTable.status }).from(longFormTable).where(
+        or(eq(longFormTable.aadharNo, aadharNo), eq(longFormTable.panNo, panNo)),
+      ).orderBy(desc(longFormTable.createdAt)).limit(1)
+    ]
+    )
 
     if (existingRows.length > 0) {
       const { status, createdAt } = existingRows[0]
@@ -35,12 +40,12 @@ const app = new Hono()
         throw new ApiError(400, "Your Application is currently in pending state")
       }
 
-      if (status === "COMPLETED" || status === "IN_PROGRESS") {
+      if (status === "IN_PROGRESS" || (status === "COMPLETED" && !applicationConfigs.allowApplicationCreationOnCompleted)) {
         throw new ApiError(400, "Your Application is already in progress")
       }
 
-      if (status === "REJECTED" && differenceInDays(new Date(), createdAt) < 60) {
-        throw new ApiError(400, "Your Application was rejected in last 60 days please try after 60 days")
+      if (status === "REJECTED" && differenceInDays(new Date(), createdAt) < applicationConfigs.applicationRejectedDays) {
+        throw new ApiError(400, `Your Application was rejected in last ${applicationConfigs.applicationRejectedDays} days please try after ${applicationConfigs.applicationRejectedDays} days`)
       }
     }
 
