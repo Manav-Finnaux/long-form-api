@@ -49,7 +49,7 @@ const app = new Hono()
       result = await saveBasicInfoService(data)
 
       const jwt = await sign(
-        { id: result.data.row.id },
+        { id: result.data.id },
         env.ANONYMOUS_CUSTOMER_JWT_SECRET,
       )
 
