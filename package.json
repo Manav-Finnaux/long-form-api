@@ -1,5 +1,5 @@
 {
-  "name": "mini-project",
+  "name": "payday-loan-backend",
   "scripts": {
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
@@ -16,6 +16,7 @@
     "hono": "^4.7.5",
     "hono-rate-limiter": "^0.4.2",
     "http-status": "^2.1.0",
+    "mysql2": "^3.14.0",
     "otp-generator": "^4.0.1",
     "pg": "^8.14.1",
     "yup": "^1.6.1"

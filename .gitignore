@@ -1,3 +1,4 @@
 # deps
 .env
 node_modules/
+drizzle-mysql.config.ts

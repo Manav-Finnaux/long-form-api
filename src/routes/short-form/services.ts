@@ -26,7 +26,7 @@ export async function saveBasicInfoService(data: any) {
 
   return {
     message: "User created",
-    data: { row: { id: rows[0].id } },
+    data: { id: rows[0].id },
   }
 }
 
