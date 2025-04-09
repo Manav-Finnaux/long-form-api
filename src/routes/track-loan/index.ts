@@ -45,7 +45,7 @@ const app = new Hono()
 
 
       const otp = generateOtp()
-      await sendOtp("9799790273", otp)
+      await sendOtp(row.mobileNo, otp)
       await saveOtp(mobileNo, otp, new Date(Date.now() + 5 * 60 * 1000))
 
 
