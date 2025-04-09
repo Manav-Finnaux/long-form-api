@@ -85,7 +85,7 @@ const app = new Hono()
       await verifyOtp(data.otp, row.mobileNo)
 
       const externalRes = await axios.post(
-        data.type === "STATEMENT" ? env.FINNAUX_APPLICATION_STATEMENT_URL : env.FINNAUX_APPLICATION_CLOSURE_URL,
+        data.type === "statement" ? env.FINNAUX_APPLICATION_STATEMENT_URL : env.FINNAUX_APPLICATION_CLOSURE_URL,
         { applicationNo: row.applicationNo }, {
         headers: {
           "Authorization": env.FINNAUX_AUTHORIZATION_HEADER_SECRET,
