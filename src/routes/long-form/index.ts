@@ -36,7 +36,7 @@ const app = new Hono()
     if (existingRows.length > 0) {
       const { status, createdAt } = existingRows[0]
 
-      if (status === "PENDING") {
+      if (status === "PENDING" || status === "HOLD") {
         throw new ApiError(400, "Your Application is currently in pending state")
       }
 
