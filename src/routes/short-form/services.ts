@@ -51,7 +51,7 @@ export async function sendMobileOtpService(id: any) {
     .from(shortFormTable)
     .where(eq(shortFormTable.id, id))
 
-  if (!row.phoneNumber) {
+  if (!row?.phoneNumber) {
     throw new ApiError(404, "User not found")
   }
 
