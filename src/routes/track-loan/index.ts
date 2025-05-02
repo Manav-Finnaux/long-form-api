@@ -58,6 +58,7 @@ const app = new Hono()
         secure: true,
         httpOnly: true,
         sameSite: "lax",
+        expires: new Date(Date.now() + 1000 * 60 * 30)
       })
 
       return c.json({ message: "OTP sent, please verify mobile number first" })
