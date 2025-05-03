@@ -1,0 +1,1 @@
+ALTER TABLE "long_form" ALTER COLUMN "dob" SET DATA TYPE timestamp;

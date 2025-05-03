@@ -10,7 +10,7 @@ export const longFormTable = pgTable("long_form", (t) => ({
     id: t.integer().primaryKey().generatedAlwaysAsIdentity(),
     firstName: t.text().notNull(),
     lastName: t.text(),
-    dob: t.date({ mode: "string" }).notNull(),
+    dob: t.timestamp({ mode: "string", withTimezone: true }).notNull(),
     gender: t.text().notNull(),
     mobileNo: encryptedText().notNull(),
     email: t.text(),
