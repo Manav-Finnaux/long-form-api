@@ -57,7 +57,7 @@ const app = new Hono()
       setCookie(c, COOKIE_NAME, jwt, {
         secure: true,
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "none",
         expires: new Date(Date.now() + 1000 * 60 * 30)
       })
 
