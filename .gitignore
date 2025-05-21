@@ -5,3 +5,4 @@ drizzle-mysql.config.ts
 drizzle-postgres.config.ts
 
 /src/migrate/
+/src/playground/
