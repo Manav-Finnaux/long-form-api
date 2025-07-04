@@ -1,5 +1,3 @@
-
-import 'dotenv/config';
 import * as yup from "yup";
 
 const envSchema = yup.object({

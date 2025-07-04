@@ -42,30 +42,30 @@ const app = new Hono()
       );
     }
   )
-  .put(
-    "/:id",
-    yupValidator("param", yup.object({ id: yup.number().required() })),
-    yupValidator(
-      "json",
-      yup.object({
-        employeeId: yup.string().notRequired().trim(),
-        employeeName: yup.string().notRequired().trim(),
-        loanNo: yup.string().notRequired().trim(),
-        applicationNo: yup.string().notRequired().trim(),
-        status: yup.string().optional().oneOf(APPLICATION_STATUS_VALUES),
-        reason: yup.string().notRequired().trim(),
-      })
-    ),
-    async (c) => {
-      const { id } = c.req.valid("param");
-      const data = c.req.valid("json");
-      await db.update(longFormTable).set(data).where(eq(longFormTable.id, id));
+// .put(
+//   "/:id",
+//   yupValidator("param", yup.object({ id: yup.number().required() })),
+//   yupValidator(
+//     "json",
+//     yup.object({
+//       employeeId: yup.string().notRequired().trim(),
+//       employeeName: yup.string().notRequired().trim(),
+//       loanNo: yup.string().notRequired().trim(),
+//       applicationNo: yup.string().notRequired().trim(),
+//       status: yup.string().optional().oneOf(APPLICATION_STATUS_VALUES),
+//       reason: yup.string().notRequired().trim(),
+//     })
+//   ),
+//   async (c) => {
+//     const { id } = c.req.valid("param");
+//     const data = c.req.valid("json");
+//     await db.update(longFormTable).set(data).where(eq(longFormTable.id, id));
 
-      return c.json(
-        { message: "Application Updated", data: null },
-        HttpStatus.OK
-      );
-    }
-  );
+//     return c.json(
+//       { message: "Application Updated", data: null },
+//       HttpStatus.OK
+//     );
+//   }
+// );
 
 export { app as location };

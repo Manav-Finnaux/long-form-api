@@ -1,0 +1,11 @@
+[
+  {
+    "id": true,
+    "key": "9997e7329aa372c275648410a5637f64",
+    "route": "1",
+    "sender_id": "MSFINP",
+    "sms": "{otp} is your OTP for Finnaux Login. Never disclose this OTP with anybody else. MSFIN Credit Pvt Ltd ",
+    "template_id": "1407170970390002027",
+    "is_active": true
+  }
+]

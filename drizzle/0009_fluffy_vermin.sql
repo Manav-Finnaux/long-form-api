@@ -1,1 +1,0 @@
-ALTER TABLE "location" DROP CONSTRAINT "location_pincode_unique";

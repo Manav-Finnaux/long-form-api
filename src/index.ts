@@ -12,8 +12,6 @@ import httpStatus from "http-status";
 import { env } from "./env";
 import { location } from "./routes/location";
 import { longForm } from "./routes/long-form";
-import { shortForm } from "./routes/short-form";
-import { trackLoan } from "./routes/track-loan";
 
 const app = new Hono();
 const PORT = env.PORT;
@@ -48,9 +46,7 @@ app.get("/", (c) => {
 
 app
   .basePath("/api")
-  .route("/short-form", shortForm)
   .route("/long-form", longForm)
-  .route("/track-loan", trackLoan)
   .route("/location", location);
 
 app.onError((err, c) => {

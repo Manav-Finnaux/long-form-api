@@ -1,7 +1,7 @@
 import { db } from "@/db"
 import { shortFormTable } from "@/db/schemas/short-form"
 import ApiError from "@/lib/error-handler"
-import { saveOtp, sendOtp, verifyOtp, } from "@/services"
+import { saveOtp, sendOtp, verifyOtp, } from "@/otp-service"
 import { generateOtp } from "@/utils"
 import { and, eq } from "drizzle-orm"
 
