@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs"
 import otpGenerator from "otp-generator"
+import { randomBytes, createHash } from "crypto"
 
 export function generateOtp() {
   return otpGenerator.generate(6, {
@@ -17,3 +18,6 @@ export async function compareHash(value: string, hashedValue: string) {
   return await bcrypt.compare(value, hashedValue)
 }
 
+export function generateVerificationToken() {
+  return randomBytes(32).toString('hex')
+}

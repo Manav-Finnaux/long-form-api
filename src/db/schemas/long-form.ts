@@ -7,54 +7,57 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     id: db.uuid().primaryKey().$defaultFn(() => crypto.randomUUID()),
 
     // Step 1: Personal Info
-    name: db.text().notNull(),
-    fatherName: db.text().notNull(),
-    dob: db.timestamp({ mode: "string", withTimezone: true }).notNull(),
-    gender: genderEnum().notNull(),
-    mobileNo: encryptedText().notNull(),
+    name: db.text(),
+    fatherName: db.text(),
+    dob: db.timestamp({ mode: "string", withTimezone: true }),
+    gender: genderEnum(),
+    mobileNo: encryptedText().unique(),
+    isMobileOtpVerified: db.boolean().default(false),
 
     // Step 2: Email Verification
-    personalEmail: db.text().notNull(),
-    officeEmail: db.text(),
+    personalEmail: encryptedText().unique(),
+    isPersonalEmailOtpVerified: db.boolean().default(false),
+    officeEmail: encryptedText().unique(),
+    isOfficeEmailVerified: db.boolean().default(false),
 
     // Step 3: Address Details
-    address1: db.text().notNull(),
+    address1: db.text(),
     address2: db.text(),
-    landmark: db.text().notNull(),
-    pinCode: db.text().notNull(),
-    area: db.text().notNull(),
-    district: db.text().notNull(),
-    state: db.text().notNull(),
+    landmark: db.text(),
+    pinCode: db.text(),
+    area: db.text(),
+    district: db.text(),
+    state: db.text(),
 
     // Step 4: Document Upload
-    aadhaarNo: encryptedText().notNull(),
-    panNo: encryptedText().notNull(),
-    profilePicture: db.text().notNull(),
-    aadhaarFront: db.text().notNull(),
-    aadhaarBack: db.text().notNull(),
-    panCard: db.text().notNull(),
+    aadhaarNo: encryptedText(),
+    panNo: encryptedText(),
+    profilePicture: db.text(),
+    aadhaarFront: db.text(),
+    aadhaarBack: db.text(),
+    panCard: db.text(),
     termsAccepted: db.boolean().default(false),
 
     // Step 5: Income Details
-    incomeType: db.text().notNull(),
-    organizationName: db.text().notNull(),
-    designation: db.text().notNull(),
-    monthlyIncome: db.doublePrecision().notNull(),
-    workingYears: db.doublePrecision().notNull(),
-    salarySlips: db.jsonb().$type<string[]>().notNull(),
+    incomeType: db.text(),
+    organizationName: db.text(),
+    designation: db.text(),
+    monthlyIncome: db.doublePrecision(),
+    workingYears: db.doublePrecision(),
+    salarySlips: db.jsonb().$type<string[]>(),
 
     // Step 6: Loan Details
-    loanAmount: db.doublePrecision().notNull(),
-    loanPeriod: db.integer().notNull(),
-    bankAccountNo: db.integer().notNull(),
-    ifscCode: db.text().notNull(),
-    bankName: db.text().notNull(),
-    bankStatement: db.text().notNull(),
+    loanAmount: db.doublePrecision(),
+    loanPeriod: db.integer(),
+    bankAccountNo: db.integer(),
+    ifscCode: db.text(),
+    bankName: db.text(),
+    bankStatement: db.text(),
 
     // Step 7: Final Submission
     loanPurpose: db.text(),
 
     // meta
-    createdAt: db.timestamp({ mode: "string", withTimezone: true }).defaultNow().notNull(),
+    createdAt: db.timestamp({ mode: "string", withTimezone: true }).defaultNow(),
     updatedAt: db.timestamp({ mode: "string", withTimezone: true }).$onUpdateFn(() => sql`now()`)
 }))

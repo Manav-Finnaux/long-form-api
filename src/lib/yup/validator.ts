@@ -140,6 +140,7 @@ export const yupValidator = <
         {
           data: null,
           message: result.error.errors,
+          variant: 'Schema error'
         },
         400,
       )

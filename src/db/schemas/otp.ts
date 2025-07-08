@@ -1,9 +1,9 @@
-import { pgTable, varchar } from "drizzle-orm/pg-core";
+import { pgTable } from "drizzle-orm/pg-core";
 import { encryptedText } from "../custom-data-types";
 
 
-export const otpTable = pgTable("otp", (t) => ({
+export const tokenTable = pgTable("token", (t) => ({
     target: encryptedText().primaryKey().notNull(),
-    otp: varchar({ length: 255 }).notNull(),
-    otpExpireAt: t.timestamp({ mode: "string", withTimezone: true }).notNull(),
+    token: t.text().notNull(),
+    tokenExpireAt: t.timestamp({ mode: "string", withTimezone: true }).notNull()
 }));

@@ -1,9 +1,321 @@
 {
-  "id": "c53e0ea2-caf3-4861-bf2d-a8a074102e32",
+  "id": "656788bf-fb07-4e53-bbb7-6cbe177a3c25",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.longFormTable": {
+      "name": "longFormTable",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fatherName": {
+          "name": "fatherName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dob": {
+          "name": "dob",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
+          "type": "gender",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "mobileNo": {
+          "name": "mobileNo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isMobileOtpVerified": {
+          "name": "isMobileOtpVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "personalEmail": {
+          "name": "personalEmail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isPersonalEmailOtpVerified": {
+          "name": "isPersonalEmailOtpVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "officeEmail": {
+          "name": "officeEmail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isOfficeEmailVerified": {
+          "name": "isOfficeEmailVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "address1": {
+          "name": "address1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address2": {
+          "name": "address2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "landmark": {
+          "name": "landmark",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pinCode": {
+          "name": "pinCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "area": {
+          "name": "area",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "district": {
+          "name": "district",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "state": {
+          "name": "state",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aadhaarNo": {
+          "name": "aadhaarNo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "panNo": {
+          "name": "panNo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profilePicture": {
+          "name": "profilePicture",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aadhaarFront": {
+          "name": "aadhaarFront",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aadhaarBack": {
+          "name": "aadhaarBack",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "panCard": {
+          "name": "panCard",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "termsAccepted": {
+          "name": "termsAccepted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "incomeType": {
+          "name": "incomeType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organizationName": {
+          "name": "organizationName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "designation": {
+          "name": "designation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monthlyIncome": {
+          "name": "monthlyIncome",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "workingYears": {
+          "name": "workingYears",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "salarySlips": {
+          "name": "salarySlips",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loanAmount": {
+          "name": "loanAmount",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loanPeriod": {
+          "name": "loanPeriod",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bankAccountNo": {
+          "name": "bankAccountNo",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ifscCode": {
+          "name": "ifscCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bankName": {
+          "name": "bankName",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "bankStatement": {
+          "name": "bankStatement",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loanPurpose": {
+          "name": "loanPurpose",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "longFormTable_mobileNo_unique": {
+          "name": "longFormTable_mobileNo_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "mobileNo"
+          ]
+        },
+        "longFormTable_personalEmail_unique": {
+          "name": "longFormTable_personalEmail_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "personalEmail"
+          ]
+        },
+        "longFormTable_officeEmail_unique": {
+          "name": "longFormTable_officeEmail_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "officeEmail"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.token": {
+      "name": "token",
+      "schema": "",
+      "columns": {
+        "target": {
+          "name": "target",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "token": {
+          "name": "token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tokenExpireAt": {
+          "name": "tokenExpireAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.location": {
       "name": "location",
       "schema": "",
@@ -99,275 +411,6 @@
           "with": {}
         }
       },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.otp": {
-      "name": "otp",
-      "schema": "",
-      "columns": {
-        "target": {
-          "name": "target",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "otp": {
-          "name": "otp",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "otpExpireAt": {
-          "name": "otpExpireAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.longFormTable": {
-      "name": "longFormTable",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "fatherName": {
-          "name": "fatherName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "dob": {
-          "name": "dob",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "gender": {
-          "name": "gender",
-          "type": "gender",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "mobileNo": {
-          "name": "mobileNo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "personalEmail": {
-          "name": "personalEmail",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "officeEmail": {
-          "name": "officeEmail",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "address1": {
-          "name": "address1",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "address2": {
-          "name": "address2",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "landmark": {
-          "name": "landmark",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "pinCode": {
-          "name": "pinCode",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "area": {
-          "name": "area",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "district": {
-          "name": "district",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "state": {
-          "name": "state",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "aadhaarNo": {
-          "name": "aadhaarNo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "panNo": {
-          "name": "panNo",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "profilePicture": {
-          "name": "profilePicture",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "aadhaarFront": {
-          "name": "aadhaarFront",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "aadhaarBack": {
-          "name": "aadhaarBack",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "panCard": {
-          "name": "panCard",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "termsAccepted": {
-          "name": "termsAccepted",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "incomeType": {
-          "name": "incomeType",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "organizationName": {
-          "name": "organizationName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "designation": {
-          "name": "designation",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "monthlyIncome": {
-          "name": "monthlyIncome",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "workingYears": {
-          "name": "workingYears",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "salarySlips": {
-          "name": "salarySlips",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "loanAmount": {
-          "name": "loanAmount",
-          "type": "double precision",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "loanPeriod": {
-          "name": "loanPeriod",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "bankAccountNo": {
-          "name": "bankAccountNo",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "ifscCode": {
-          "name": "ifscCode",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "bankName": {
-          "name": "bankName",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "bankStatement": {
-          "name": "bankStatement",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "loanPurpose": {
-          "name": "loanPurpose",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "createdAt": {
-          "name": "createdAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updatedAt": {
-          "name": "updatedAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

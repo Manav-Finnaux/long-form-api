@@ -1,6 +1,4 @@
 import { db } from "@/db";
-import { APPLICATION_STATUS_VALUES } from "@/db/schemas/enums";
-import { longFormTable } from "@/db/schemas/long-form";
 import { locationTable } from "@/db/schemas/pincodes";
 import ApiError from "@/lib/error-handler";
 import yup from "@/lib/yup";

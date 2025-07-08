@@ -1,7 +1,7 @@
 import { db } from "@/db"
 import { shortFormTable } from "@/db/schemas/short-form"
 import ApiError from "@/lib/error-handler"
-import { saveOtp, sendOtp, verifyOtp, } from "@/otp-service"
+import { saveToken, sendMobileOtp, verifyToken, } from "@/verification-service"
 import { generateOtp } from "@/utils"
 import { and, eq } from "drizzle-orm"
 
@@ -56,8 +56,8 @@ export async function sendMobileOtpService(id: any) {
   }
 
   const otp = generateOtp()
-  await sendOtp(row.phoneNumber, otp)
-  await saveOtp(row.phoneNumber, otp, new Date(Date.now() + 5 * 60 * 1000))
+  await sendMobileOtp(row.phoneNumber, otp)
+  await saveToken(row.phoneNumber, otp, new Date(Date.now() + 5 * 60 * 1000))
 
   return { message: "OTP Sent!", data: null }
 }
@@ -70,7 +70,7 @@ export async function verifyMobileOtpService(id: any, data: any) {
     .where(eq(shortFormTable.id, id))
 
 
-  await verifyOtp(data.otp, row.phoneNumber)
+  await verifyToken(data.otp, row.phoneNumber)
   await db
     .update(shortFormTable)
     .set({ isOtpVerified: true })
