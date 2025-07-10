@@ -111,16 +111,11 @@ app.put(
 
 app.get(
   "/verify-office-email/:token",
-  jwt({
-    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
-    cookie: env.COOKIE_NAME
-  }),
   yupValidator("param", verifyTokenSchema),
   async (c) => {
     const { token } = c.req.valid("param")
-    const id = c.get("jwtPayload").id
 
-    const result = await verifyOfficialEmailService(id, token)
+    const result = await verifyOfficialEmailService(token)
     const isVerified = result.message === 'Office email verified'
 
     const uiUrl = `${env.UI_URL}/verification-response/${isVerified ? 1 : 0}`

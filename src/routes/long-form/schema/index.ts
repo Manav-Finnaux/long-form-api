@@ -31,14 +31,15 @@ export type step3Type = yup.InferType<typeof step3Schema>
 
 
 export const step4Schema = yup.object({
-    aadharNo: yup.string().required().trim().matches(Regex.AADHAAR, "Invalid Aadhar"),
+    aadhaarNo: yup.string().required().trim().matches(Regex.AADHAAR, "Invalid Aadhar"),
     panNo: yup.string().required().trim().matches(Regex.PAN, "Invalid PAN"),
-    profilePicture: yup.string().required().trim().url(),
-    aadhaarFront: yup.string().required().trim().url(),
-    aadhaarBack: yup.string().required().trim().url(),
-    panCard: yup.string().required().trim().url(),
+    profilePicture: yup.mixed(),
+    aadhaarFront: yup.mixed(),
+    aadhaarBack: yup.mixed(),
+    panCard: yup.mixed(),
     termsAccepted: yup.boolean().required(),
-}).stripUnknown()
+})
+// .stripUnknown()
 export type step4Type = yup.InferType<typeof step4Schema>
 
 

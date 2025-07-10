@@ -1,6 +1,9 @@
 import bcrypt from "bcryptjs"
+import { randomBytes } from "crypto"
+import { existsSync } from "fs"
+import { mkdir, writeFile } from "fs/promises"
 import otpGenerator from "otp-generator"
-import { randomBytes, createHash } from "crypto"
+import { dirname } from "path"
 
 export function generateOtp() {
   return otpGenerator.generate(6, {
@@ -20,4 +23,59 @@ export async function compareHash(value: string, hashedValue: string) {
 
 export function generateVerificationToken() {
   return randomBytes(32).toString('hex')
+}
+
+// export async function storeFile(file: [string, string], id: string) {
+//   const [base64, fileName] = file
+
+//   // Decode base64 to buffer
+//   const buffer = Buffer.from(base64, 'base64')
+//   const newFileName = id + fileName;
+//   const filePath = `./uploads/${newFileName}`
+
+//   // Write the buffer to a file
+//   const dir = dirname(filePath)
+
+//   // Create directory if it doesn't exist
+//   if (!existsSync(dir)) {
+//     await mkdir(dir, { recursive: true })
+//   }
+
+//   // Write the file
+//   await writeFile(filePath, buffer)
+
+//   return { message: `${newFileName} saved successfully` }
+// }
+
+export async function storeFile(file: [string, string], id: string) {
+  const [base64, fileName] = file
+  const newFileName = id + fileName
+  const filePath = `./src/uploads/${newFileName}`
+  const dir = dirname(filePath)
+
+  try {
+    // Decode base64 to buffer
+    const buffer = Buffer.from(base64, 'base64')
+
+    // Validate base64 encoding (optional)
+    if (!Buffer.isBuffer(buffer) || buffer.length === 0) {
+      throw new Error('Invalid base64 file data.')
+    }
+
+    // Create directory if it doesn't exist
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true })
+    }
+
+    // Write the file
+    await writeFile(filePath, buffer)
+
+    return { message: `${newFileName} saved successfully`, filePath }
+  } catch (error: any) {
+    console.error(`Error saving file:`, error)
+    return {
+      error: true,
+      message: `Failed to save file: ${error.message || 'Unknown error'}`
+    }
+  }
 }
