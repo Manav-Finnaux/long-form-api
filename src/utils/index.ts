@@ -1,3 +1,4 @@
+import ApiError from "@/lib/error-handler"
 import bcrypt from "bcryptjs"
 import { randomBytes } from "crypto"
 import { existsSync } from "fs"
@@ -49,7 +50,7 @@ export function generateVerificationToken() {
 
 export async function storeFile(file: [string, string], id: string) {
   const [base64, fileName] = file
-  const newFileName = id + fileName
+  const newFileName = id + '-' + fileName
   const filePath = `./src/uploads/${newFileName}`
   const dir = dirname(filePath)
 
@@ -73,9 +74,6 @@ export async function storeFile(file: [string, string], id: string) {
     return { message: `${newFileName} saved successfully`, filePath }
   } catch (error: any) {
     console.error(`Error saving file:`, error)
-    return {
-      error: true,
-      message: `Failed to save file: ${error.message || 'Unknown error'}`
-    }
+    throw new ApiError(500, error.message ? `Failed to save file: ${error.message}` : 'Unknown Error')
   }
 }

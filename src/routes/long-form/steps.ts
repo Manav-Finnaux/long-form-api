@@ -9,7 +9,7 @@ import { Hono } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
 import { jwt, sign, verify } from "hono/jwt"
 import HttpStatus from "http-status"
-import { step1Schema, step1Type, step2Schema, step3Schema, step4Schema, step4Type } from "./schema"
+import { step1Schema, step1Type, step2Schema, step3Schema, step4Schema, step4Type, step5Schema, step5Type, step6Schema, step6Type, step7Schema, step7Type } from "./schema"
 import { saveStep1DataService, updateStep1DataService } from "./services"
 
 const app = new Hono()
@@ -127,8 +127,6 @@ app.post(
     const { filePath: panCard } = await storeFile(documentsData.panCard, id)
     const { filePath: profilePicture } = await storeFile(documentsData.profilePicture, id)
 
-    console.log('file store successful!')
-
     const updatedData = { ...documentsData, aadhaarBack, aadhaarFront, panCard, profilePicture }
 
     await db
@@ -136,9 +134,87 @@ app.post(
       .set(updatedData)
       .where(eq(longFormTable.id, id))
 
-    return c.json({ message: 'Data saved!' }, HttpStatus.OK)
+    return c.json({ message: 'Step 4 data saved successfully' }, HttpStatus.OK)
   }
 )
 
+app.post(
+  "/5",
+  jwt({
+    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+    cookie: env.COOKIE_NAME,
+  }),
+  yupValidator("json", step5Schema),
+  async (c) => {
+    const data: step5Type = c.req.valid("json")
+    const id: string = c.get('jwtPayload').id
+
+    // save salary slips
+    const salarySlipPaths = await Promise.all(
+      data.salarySlips.map(async (salarySlip) => {
+        const res = await storeFile(salarySlip as [string, string], id) // salarySlip as [base64, fileName]
+
+        return res.filePath
+      })
+    )
+
+    await db
+      .update(longFormTable)
+      .set({
+        ...data,
+        salarySlips: salarySlipPaths
+      })
+      .where(eq(longFormTable.id, id))
+
+    return c.json({ msg: 'Step 5 data saved successfully' }, HttpStatus.OK)
+  }
+)
+
+app.post(
+  "/6",
+  jwt({
+    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+    cookie: env.COOKIE_NAME,
+  }),
+  yupValidator("json", step6Schema),
+  async (c) => {
+    const data: step6Type = c.req.valid('json')
+    const id: string = c.get('jwtPayload').id
+
+    const { filePath: bankStatement, message } = await storeFile(data.bankStatement as [string, string], id)
+
+    await db
+      .update(longFormTable)
+      .set({
+        ...data,
+        bankStatement
+      })
+      .where(eq(longFormTable.id, id))
+
+    return c.json({ msg: 'abc' }, HttpStatus.OK)
+  }
+)
+
+app.post(
+  "/7",
+  jwt({
+    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+    cookie: env.COOKIE_NAME,
+  }),
+  yupValidator("json", step7Schema),
+  async (c) => {
+    const data: step7Type = c.req.valid('json')
+    const id: string = c.get('jwtPayload').id
+
+    console.log({ loanPurpose: data.loanPurpose })
+
+    await db
+      .update(longFormTable)
+      .set(data)
+      .where(eq(longFormTable.id, id))
+
+    return c.json({ message: 'Step 7 data saved successfully' }, HttpStatus.OK)
+  }
+)
 
 export { app as steps }

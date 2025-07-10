@@ -38,8 +38,7 @@ export async function verifyToken(token: string, target: string) {
     throw new ApiError(400, "Invalid OTP");
   }
 
-  const [tokenRow] = await db.delete(tokenTable).where(eq(tokenTable.target, target)).returning()
-  console.log({ tokenRow })
+  await db.delete(tokenTable).where(eq(tokenTable.target, target)).returning()
 
   return true;
 }

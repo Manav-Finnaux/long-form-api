@@ -49,7 +49,7 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     // Step 6: Loan Details
     loanAmount: db.doublePrecision(),
     loanPeriod: db.integer(),
-    bankAccountNo: db.integer(),
+    bankAccountNo: db.text(), // because integer & bigint will ignore leading zeros
     ifscCode: db.text(),
     bankName: db.text(),
     bankStatement: db.text(),
