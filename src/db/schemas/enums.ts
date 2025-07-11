@@ -1,23 +1,23 @@
 import { createEnum } from "../util"
 
 
-export const {
-    enum: EnquiryStatusEnum,
-    values: ENQUIRY_STATUS_VALUES,
-    pgEnum: enquiryStatusEnum
-} = createEnum({
-    name: "enquiryStatus",
-    values: ["PENDING", "CALLED", "PROCESSED"]
-})
+// export const {
+//     enum: EnquiryStatusEnum,
+//     values: ENQUIRY_STATUS_VALUES,
+//     pgEnum: enquiryStatusEnum
+// } = createEnum({
+//     name: "enquiryStatus",
+//     values: ["PENDING", "CALLED", "PROCESSED"]
+// })
 
-export const {
-    enum: ApplicationStatusEnum,
-    values: APPLICATION_STATUS_VALUES,
-    pgEnum: applicationStatusEnum
-} = createEnum({
-    name: "applicationStatus",
-    values: ["PENDING", "IN_PROGRESS", "REJECTED", "COMPLETED", "CLOSED", "HOLD"]
-})
+// export const {
+//     enum: ApplicationStatusEnum,
+//     values: APPLICATION_STATUS_VALUES,
+//     pgEnum: applicationStatusEnum
+// } = createEnum({
+//     name: "applicationStatus",
+//     values: ["PENDING", "IN_PROGRESS", "REJECTED", "COMPLETED", "CLOSED", "HOLD"]
+// })
 
 export const {
     enum: GenderEnum,
@@ -29,11 +29,11 @@ export const {
 })
 
 
-export const {
-    enum: MaritalStatusEnum,
-    values: MARITAL_STATUS_VALUES,
-    pgEnum: maritalStatusEnum
-} = createEnum({
-    name: "maritalStatus",
-    values: ["MARRIED", "SINGLE", "DIVORCED", "WIDOWED", "SEPARATED"]
-})
+// export const {
+//     enum: MaritalStatusEnum,
+//     values: MARITAL_STATUS_VALUES,
+//     pgEnum: maritalStatusEnum
+// } = createEnum({
+//     name: "maritalStatus",
+//     values: ["MARRIED", "SINGLE", "DIVORCED", "WIDOWED", "SEPARATED"]
+// })

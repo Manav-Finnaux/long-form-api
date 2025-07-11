@@ -26,28 +26,6 @@ export function generateVerificationToken() {
   return randomBytes(32).toString('hex')
 }
 
-// export async function storeFile(file: [string, string], id: string) {
-//   const [base64, fileName] = file
-
-//   // Decode base64 to buffer
-//   const buffer = Buffer.from(base64, 'base64')
-//   const newFileName = id + fileName;
-//   const filePath = `./uploads/${newFileName}`
-
-//   // Write the buffer to a file
-//   const dir = dirname(filePath)
-
-//   // Create directory if it doesn't exist
-//   if (!existsSync(dir)) {
-//     await mkdir(dir, { recursive: true })
-//   }
-
-//   // Write the file
-//   await writeFile(filePath, buffer)
-
-//   return { message: `${newFileName} saved successfully` }
-// }
-
 export async function storeFile(file: [string, string], id: string) {
   const [base64, fileName] = file
   const newFileName = id + '-' + fileName
