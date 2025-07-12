@@ -11,13 +11,13 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     fatherName: db.text(),
     dob: db.timestamp({ mode: "string", withTimezone: true }),
     gender: genderEnum(),
-    mobileNo: encryptedText().unique(),
+    mobileNo: encryptedText(),
     isMobileOtpVerified: db.boolean().default(false),
 
     // Step 2: Email Verification
-    personalEmail: encryptedText().unique(),
+    personalEmail: encryptedText(),
     isPersonalEmailOtpVerified: db.boolean().default(false),
-    officeEmail: encryptedText().unique(),
+    officeEmail: encryptedText(),
     isOfficeEmailVerified: db.boolean().default(false),
 
     // Step 3: Address Details

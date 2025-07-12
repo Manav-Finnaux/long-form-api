@@ -6,6 +6,7 @@ import { generateOtp, generateVerificationToken } from "@/utils"
 import { eq } from "drizzle-orm"
 import HttpStatus from "http-status"
 import { tokenTable } from "@/db/schemas/token"
+import { step1Type } from "./schema"
 
 export async function sendMobileOtpService(id: string) {
   const [row] = await db
@@ -111,7 +112,7 @@ export async function verifyOfficialEmailService(param: string) {
 
 
 
-export async function saveStep1DataService(data: any, step: number) {
+export async function saveStep1DataService(data: step1Type, step: number) {
   return await db.transaction(async (tx) => {
     const rows = await tx.insert(longFormTable).values(data).returning({ id: longFormTable.id })
 
@@ -119,7 +120,7 @@ export async function saveStep1DataService(data: any, step: number) {
   })
 }
 
-export async function updateStep1DataService(id: string, data: any, step: number) {
+export async function updateStep1DataService(id: string, data: step1Type, step: number) {
   const row = await db
     .select({
       mobileNo: longFormTable.mobileNo,

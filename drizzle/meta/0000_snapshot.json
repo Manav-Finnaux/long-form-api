@@ -1,5 +1,5 @@
 {
-  "id": "8160dc03-e28e-4325-b089-ad53abde589b",
+  "id": "2f2fd5d0-d6ef-47bc-99df-f6620cecbca7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -213,7 +213,7 @@
         },
         "bankAccountNo": {
           "name": "bankAccountNo",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -258,29 +258,7 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "longFormTable_mobileNo_unique": {
-          "name": "longFormTable_mobileNo_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "mobileNo"
-          ]
-        },
-        "longFormTable_personalEmail_unique": {
-          "name": "longFormTable_personalEmail_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "personalEmail"
-          ]
-        },
-        "longFormTable_officeEmail_unique": {
-          "name": "longFormTable_officeEmail_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "officeEmail"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -414,13 +392,6 @@
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
-        },
-        "isUsed": {
-          "name": "isUsed",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
         }
       },
       "indexes": {},
@@ -433,27 +404,6 @@
     }
   },
   "enums": {
-    "public.application_status": {
-      "name": "application_status",
-      "schema": "public",
-      "values": [
-        "PENDING",
-        "IN_PROGRESS",
-        "REJECTED",
-        "COMPLETED",
-        "CLOSED",
-        "HOLD"
-      ]
-    },
-    "public.enquiry_status": {
-      "name": "enquiry_status",
-      "schema": "public",
-      "values": [
-        "PENDING",
-        "CALLED",
-        "PROCESSED"
-      ]
-    },
     "public.gender": {
       "name": "gender",
       "schema": "public",
@@ -461,17 +411,6 @@
         "MALE",
         "FEMALE",
         "OTHER"
-      ]
-    },
-    "public.marital_status": {
-      "name": "marital_status",
-      "schema": "public",
-      "values": [
-        "MARRIED",
-        "SINGLE",
-        "DIVORCED",
-        "WIDOWED",
-        "SEPARATED"
       ]
     }
   },

@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752125868845,
-      "tag": "0000_dry_miss_america",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1752126043882,
-      "tag": "0001_bright_the_hand",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752148283251,
-      "tag": "0002_furry_garia",
+      "when": 1752310971465,
+      "tag": "0000_dazzling_vapor",
       "breakpoints": true
     }
   ]
