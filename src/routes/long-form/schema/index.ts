@@ -52,8 +52,8 @@ export const step5Schema = yup.object({
   // look at "/5" route's code
   salarySlips: yup
     .array()
-    .of(yup.mixed())
-    .length(3)
+    .min(1)
+    .max(3)
     .required()
 }).stripUnknown()
 export type step5Type = yup.InferType<typeof step5Schema>
@@ -61,7 +61,7 @@ export type step5Type = yup.InferType<typeof step5Schema>
 
 export const step6Schema = yup.object({
   loanAmount: yup.number().required().min(0),
-  loanPeriod: yup.number().required().min(6),
+  loanPeriod: yup.number().required().min(1).max(6),
   bankAccountNo: yup.string().required(),
   ifscCode: yup.string().required(),
   bankName: yup.string().required(),
