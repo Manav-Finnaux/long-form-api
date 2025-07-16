@@ -1,19 +1,19 @@
 import { env } from "@/env"
 import ApiError from "@/lib/error-handler"
-import yup from "@/lib/yup"
 import { yupValidator } from "@/lib/yup/validator"
 import { Hono } from "hono"
 import { rateLimiter } from "hono-rate-limiter"
 import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
-import { step2Schema, verifyTokenSchema } from "./schema"
-import { saveOfficeEmailService, savePersonalEmailService, sendEmailOtpService, sendMobileOtpService, sendOfficialMailVerificationLinkService, verifyEmailOtpService, verifyMobileOtpService, verifyOfficialEmailService } from "./services"
+import { getEmailOtpSchema, verifyTokenSchema } from "./schema"
+import { savePersonalEmailService, sendEmailOtpService, sendMobileOtpService, verifyEmailOtpService, verifyMobileOtpService } from "./services"
 
-// the cookie was added in step 1 at steps.ts
+// the cookie was added in create-cookie route
 // all the routes below will have access to the id
 
 const app = new Hono()
 
+// request phone otp
 app.put(
   "/phone-otp",
   jwt({
@@ -37,6 +37,7 @@ app.put(
   }
 )
 
+// verify phone otp
 app.put(
   "/verify-phone-otp",
   jwt({
@@ -53,17 +54,20 @@ app.put(
   }
 )
 
+// request email otp
 app.put(
   "/email-otp",
   jwt({
     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
     cookie: env.COOKIE_NAME
   }),
-  yupValidator("json", step2Schema),
+  yupValidator("json", getEmailOtpSchema),
   async (c) => {
-    const { personalEmail } = c.req.valid("json")
+    const { email } = c.req.valid("json")
     const id = c.get("jwtPayload").id
-    const { data } = await savePersonalEmailService(id, personalEmail)
+
+    // this function will also check internally that mobileNo is verified
+    const { data } = await savePersonalEmailService(id, email)
 
     if (!data.sendOtp) {
       throw new ApiError(500, "Something went wrong!")
@@ -73,6 +77,7 @@ app.put(
   }
 )
 
+// verify email otp
 app.put(
   "/verify-email-otp",
   jwt({
@@ -88,39 +93,39 @@ app.put(
   }
 )
 
-app.put(
-  "/send-office-verification-link",
-  jwt({
-    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
-    cookie: env.COOKIE_NAME
-  }),
-  yupValidator("json", yup.object({
-    officeEmail: yup.string().email().required()
-  })),
-  async (c) => {
-    const { officeEmail } = c.req.valid("json")
-    const id = c.get("jwtPayload").id
-    const { data } = await saveOfficeEmailService(id, officeEmail)
+// // request office email otp
+// app.put(
+//   "/send-office-verification-link",
+//   jwt({
+//     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+//     cookie: env.COOKIE_NAME
+//   }),
+//   yupValidator("json", getEmailOtpSchema),
+//   async (c) => {
+//     const { email } = c.req.valid("json")
+//     const id = c.get("jwtPayload").id
+//     const { data } = await saveOfficeEmailService(id, email)
 
-    if (!data.sendVerificationLink) {
-      throw new ApiError(500, "Something went wrong!")
-    }
-    return c.json(await sendOfficialMailVerificationLinkService(id), HttpStatus.OK)
-  }
-)
+//     if (!data.sendVerificationLink) {
+//       throw new ApiError(500, "Something went wrong!")
+//     }
+//     return c.json(await sendOfficialMailVerificationLinkService(id), HttpStatus.OK)
+//   }
+// )
 
-app.get(
-  "/verify-office-email/:token",
-  yupValidator("param", verifyTokenSchema),
-  async (c) => {
-    const { token } = c.req.valid("param")
+// // verify 
+// app.get(
+//   "/verify-office-email/:token",
+//   yupValidator("param", verifyTokenSchema),
+//   async (c) => {
+//     const { token } = c.req.valid("param")
 
-    const result = await verifyOfficialEmailService(token)
-    const isVerified = result.message === 'Office email verified'
+//     const result = await verifyOfficialEmailService(token)
+//     const isVerified = result.message === 'Office email verified'
 
-    const uiUrl = `${env.UI_URL}/verification-response/${isVerified ? 1 : 0}`
-    return c.redirect(uiUrl, HttpStatus.PERMANENT_REDIRECT)
-  }
-)
+//     const uiUrl = `${env.UI_URL}/verification-response/${isVerified ? 1 : 0}`
+//     return c.redirect(uiUrl, HttpStatus.PERMANENT_REDIRECT)
+//   }
+// )
 
 export { app as verification }

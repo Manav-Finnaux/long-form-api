@@ -7,18 +7,19 @@ export const step1Schema = yup.object({
   fatherName: yup.string().required().trim(),
   dob: yup.string().datetime().required(),
   gender: yup.string().oneOf(GENDER_VALUES).required(),
-  mobileNo: yup.string().required().matches(Regex.PHONE_NUMBER, "Invalid Phone Number"),
+  // mobileNo: yup.string().matches(Regex.PHONE_NUMBER, "Invalid Phone Number"),
+  // personalEmail: yup.string().trim().email(),
 }).stripUnknown()
 export type step1Type = yup.InferType<typeof step1Schema>
 
-export const step2Schema = yup.object({
-  personalEmail: yup.string().required().trim().email(),
-  officeEmail: yup.string().trim().email(),
-  officeEmailVerificationLinkSent: yup.boolean().required()
-}).stripUnknown()
-export type step2Type = yup.InferType<typeof step2Schema>
+// export const step2Schema = yup.object({
+//   personalEmail: yup.string().required().trim().email(),
+// officeEmail: yup.string().trim().email(),
+// officeEmailVerificationLinkSent: yup.boolean().required()
+// }).stripUnknown()
+// export type step2Type = yup.InferType<typeof step2Schema>
 
-export const step3Schema = yup.object({
+export const step2Schema = yup.object({
   address1: yup.string().required().trim(),
   address2: yup.string().trim(),
   landmark: yup.string().required().trim(),
@@ -27,10 +28,10 @@ export const step3Schema = yup.object({
   district: yup.string().required().trim(),
   state: yup.string().required().trim(),
 }).stripUnknown()
-export type step3Type = yup.InferType<typeof step3Schema>
+export type step2Type = yup.InferType<typeof step2Schema>
 
 
-export const step4Schema = yup.object({
+export const step3Schema = yup.object({
   aadhaarNo: yup.string().required().trim().matches(Regex.AADHAAR, "Invalid Aadhar"),
   panNo: yup.string().required().trim().matches(Regex.PAN, "Invalid PAN"),
   profilePicture: yup.mixed(),
@@ -40,26 +41,30 @@ export const step4Schema = yup.object({
   termsAccepted: yup.boolean().required(),
 })
 // .stripUnknown()
-export type step4Type = yup.InferType<typeof step4Schema>
+export type step3Type = yup.InferType<typeof step3Schema>
 
-export const step5Schema = yup.object({
+export const step4Schema = yup.object({
   incomeType: yup.string().required().trim(),
   organizationName: yup.string().required().trim(),
   designation: yup.string().required().trim(),
   monthlyIncome: yup.number().required().min(0),
   workingYears: yup.number().min(0.5).required(),
   // this can be improved
-  // look at "/5" route's code
   salarySlips: yup
     .array()
     .min(1)
     .max(3)
     .required()
 }).stripUnknown()
-export type step5Type = yup.InferType<typeof step5Schema>
+export type step4Type = yup.InferType<typeof step4Schema>
+
+export const employmentProofSchema = yup.object({
+  document: yup.mixed()
+}).stripUnknown()
+export type employmentProofType = yup.InferType<typeof employmentProofSchema>
 
 
-export const step6Schema = yup.object({
+export const step5Schema = yup.object({
   loanAmount: yup.number().required().min(0),
   loanPeriod: yup.number().required().min(1).max(6),
   bankAccountNo: yup.string().required(),
@@ -71,13 +76,13 @@ export const step6Schema = yup.object({
     .length(2)
     .required()
 }).stripUnknown()
-export type step6Type = yup.InferType<typeof step6Schema>
+export type step5Type = yup.InferType<typeof step5Schema>
 
 
-export const step7Schema = yup.object({
+export const step6Schema = yup.object({
   loanPurpose: yup.string()
 }).stripUnknown()
-export type step7Type = yup.InferType<typeof step7Schema>
+export type step6Type = yup.InferType<typeof step6Schema>
 
 export const verifyTokenSchema = yup.object({
   token: yup.string().required(),
@@ -88,5 +93,10 @@ export const getMobileOtpSchema = yup.object({
 })
 
 export const getEmailOtpSchema = yup.object({
-  personalEmail: yup.string().required().trim().email(),
+  email: yup.string().required().trim().email(),
 })
+
+export const createCookieSchema = yup.object({
+  mobileNo: yup.string().matches(Regex.PHONE_NUMBER, "Invalid Phone Number").required(),
+})
+export type createCookieType = yup.InferType<typeof createCookieSchema>

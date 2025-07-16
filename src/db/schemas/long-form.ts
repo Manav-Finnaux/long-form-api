@@ -13,14 +13,10 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     gender: genderEnum(),
     mobileNo: encryptedText(),
     isMobileOtpVerified: db.boolean().default(false),
-
-    // Step 2: Email Verification
     personalEmail: encryptedText(),
     isPersonalEmailOtpVerified: db.boolean().default(false),
-    officeEmail: encryptedText(),
-    isOfficeEmailVerified: db.boolean().default(false),
 
-    // Step 3: Address Details
+    // Step 2: Address Details
     address1: db.text(),
     address2: db.text(),
     landmark: db.text(),
@@ -29,7 +25,7 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     district: db.text(),
     state: db.text(),
 
-    // Step 4: Document Upload
+    // Step 3: Document Upload
     aadhaarNo: encryptedText(),
     panNo: encryptedText(),
     profilePicture: db.text(),
@@ -38,15 +34,18 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     panCard: db.text(),
     termsAccepted: db.boolean().default(false),
 
-    // Step 5: Income Details
+    // Step 4: Income Details
     incomeType: db.text(),
     organizationName: db.text(),
     designation: db.text(),
     monthlyIncome: db.doublePrecision(),
     workingYears: db.doublePrecision(),
     salarySlips: db.jsonb().$type<string[]>(),
+    officeEmail: encryptedText(),
+    isOfficeEmailVerified: db.boolean().default(false),
+    employmentProofDocument: db.text(),
 
-    // Step 6: Loan Details
+    // Step 5: Loan Details
     loanAmount: db.doublePrecision(),
     loanPeriod: db.integer(),
     bankAccountNo: db.text(), // because integer & bigint will ignore leading zeros
@@ -54,7 +53,7 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     bankName: db.text(),
     bankStatement: db.text(),
 
-    // Step 7: Final Submission
+    // Step 6: Final Submission
     loanPurpose: db.text(),
 
     // meta

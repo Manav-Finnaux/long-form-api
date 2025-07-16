@@ -1,12 +1,12 @@
 import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
+import { tokenTable } from "@/db/schemas/token"
 import ApiError from "@/lib/error-handler"
-import { saveToken, sendEmailOtp, sendMobileOtp, sendOfficialMailVerificationLink, verifyOfficialEmail, verifyToken } from "@/verification-service"
 import { generateOtp, generateVerificationToken } from "@/utils"
+import { saveToken, sendEmailOtp, sendMobileOtp, sendOfficialMailVerificationLink, verifyOfficialEmail, verifyToken } from "@/verification-service"
 import { eq } from "drizzle-orm"
 import HttpStatus from "http-status"
-import { tokenTable } from "@/db/schemas/token"
-import { step1Type } from "./schema"
+import { createCookieType } from "./schema"
 
 export async function sendMobileOtpService(id: string) {
   const [row] = await db
@@ -112,47 +112,55 @@ export async function verifyOfficialEmailService(param: string) {
 
 
 
-export async function saveStep1DataService(data: step1Type, step: number) {
-  return await db.transaction(async (tx) => {
-    const rows = await tx.insert(longFormTable).values(data).returning({ id: longFormTable.id })
+// export async function saveStep1DataService(data: step1Type, step: number) {
+//   return await db.transaction(async (tx) => {
+//     const rows = await tx.insert(longFormTable).values(data).returning({ id: longFormTable.id })
 
-    return step === 1 ? { message: "data added successfully", data: rows[0], sendOtp: true } : { message: "data added successfully", data: rows[0] }
-  })
-}
+//     return step === 1 ? { message: "data added successfully", data: rows[0], sendOtp: true } : { message: "data added successfully", data: rows[0] }
+//   })
+// }
 
-export async function updateStep1DataService(id: string, data: step1Type, step: number) {
-  const row = await db
-    .select({
-      mobileNo: longFormTable.mobileNo,
-      isMobileOtpVerified: longFormTable.isMobileOtpVerified
-    })
-    .from(longFormTable)
-    .where(eq(longFormTable.id, id))
+// export async function updateStep1DataService(id: string, data: step1Type, step: number) {
+//   const row = await db
+//     .select({
+//       mobileNo: longFormTable.mobileNo,
+//       isMobileOtpVerified: longFormTable.isMobileOtpVerified
+//     })
+//     .from(longFormTable)
+//     .where(eq(longFormTable.id, id))
 
-  if (row.length === 0) throw new ApiError(HttpStatus.NOT_FOUND, 'User not found')
+//   if (row.length === 0) throw new ApiError(HttpStatus.NOT_FOUND, 'User not found')
 
-  const isMobileOtpVerified = row[0]?.mobileNo === data.mobileNo ? row[0]?.isMobileOtpVerified : false
+//   const isMobileOtpVerified = row[0]?.mobileNo === data.mobileNo ? row[0]?.isMobileOtpVerified : false
 
-  await db
-    .update(longFormTable)
-    .set({ ...data, isMobileOtpVerified })
-    .where(eq(longFormTable.id, id))
+//   await db
+//     .update(longFormTable)
+//     .set({ ...data, isMobileOtpVerified })
+//     .where(eq(longFormTable.id, id))
 
-  return step === 1 ? { message: "User updated", data: null, sendOtp: isMobileOtpVerified } : { message: "User updated", data: null }
-}
+//   return step === 1 ? { message: "User updated", data: null, sendOtp: isMobileOtpVerified } : { message: "User updated", data: null }
+// }
 
 export async function savePersonalEmailService(id: string, personalEmail: string) {
-  await db
-    .update(longFormTable)
-    .set({
-      personalEmail,
-      isPersonalEmailOtpVerified: false
-    })
-    .where(eq(longFormTable.id, id))
-    .returning({
-      id: longFormTable.id,
-      personalEmail: longFormTable.personalEmail,
-    })
+  await db.transaction(async (tx) => {
+    const [isMobileVerified] = await tx.select({ isMobileVerified: longFormTable.isMobileOtpVerified }).from(longFormTable)
+
+    if (!isMobileVerified) {
+      throw new ApiError(HttpStatus.BAD_REQUEST, "Mobile number is not verified.")
+    }
+
+    await tx
+      .update(longFormTable)
+      .set({
+        personalEmail,
+        isPersonalEmailOtpVerified: false
+      })
+      .where(eq(longFormTable.id, id))
+      .returning({
+        id: longFormTable.id,
+        personalEmail: longFormTable.personalEmail,
+      })
+  })
 
   return { message: "Personal email added", data: { sendOtp: true } }
 }
@@ -171,4 +179,20 @@ export async function saveOfficeEmailService(id: string, officeEmail: string) {
     })
 
   return { message: "Office email added", data: { sendVerificationLink: true } }
+}
+
+export async function savePhoneNumber(data: createCookieType): Promise<{ id: string }> {
+  const rows = await db.insert(longFormTable).values(data).returning({ id: longFormTable.id })
+
+  return { id: rows[0].id }
+}
+
+export async function updatePhoneNumber(id: string, data: createCookieType) {
+  const rows = await db.update(longFormTable).set({
+    mobileNo: data.mobileNo
+  })
+    .where(eq(longFormTable.id, id))
+    .returning({ id: longFormTable.id })
+
+  return { id: rows[0].id }
 }
