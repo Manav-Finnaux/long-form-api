@@ -3,10 +3,11 @@ import { tokenTable } from "@/db/schemas/token";
 import { env } from "@/env";
 import ApiError from "@/lib/error-handler";
 import { compareHash, getHashedValue } from "@/utils";
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 import axios from "axios";
 import { eq } from "drizzle-orm";
 import nodemailer from 'nodemailer';
-import { renderOtpEmail, renderVerificationLinkEmail } from "./email-template";
+import { renderOtpEmail } from "./email-template";
 
 export async function saveToken(target: string, otp: string, otpExpireAt: Date) {
   const hashedOtp = await getHashedValue(otp);
@@ -16,7 +17,7 @@ export async function saveToken(target: string, otp: string, otpExpireAt: Date) 
     .values({ target, token: hashedOtp, tokenExpireAt: otpExpireAtIso })
     .onConflictDoUpdate({
       set: { token: hashedOtp, tokenExpireAt: otpExpireAtIso },
-      target: tokenTable.id,
+      target: tokenTable.target,
     })
     .returning({ id: tokenTable.id });
 
@@ -76,13 +77,17 @@ export async function sendMobileOtp(mobileNo: string, otp: string) {
   axios.get(url);
 }
 
+const sesClient = new SESv2Client({
+  region: env.EMAIL_REGION,
+  credentials: {
+    accessKeyId: env.AWS_SES_ACCESS_KEY_ID,
+    secretAccessKey: env.AWS_SES_SECRET_ACCESS_KEY
+  }
+})
+
 const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: env.GMAIL_ID,
-    pass: env.GOOGLE_APP_PASSWORD,
-  },
-});
+  SES: { sesClient, SendEmailCommand }
+})
 
 export async function sendEmailOtp(personalEmail: string, otp: string) {
   try {
@@ -90,34 +95,13 @@ export async function sendEmailOtp(personalEmail: string, otp: string) {
     const subject = `Your OTP code`;
 
     await transporter.sendMail({
-      from: env.GMAIL_ID,
+      from: env.EMAIL_ID,
       to: personalEmail,
       subject,
       html: emailHtml
     });
 
     return { message: "OTP sent" };
-  }
-  catch (e) {
-    console.log(e);
-    return { message: 'Something went wrong!' }
-  }
-}
-
-export async function sendOfficialMailVerificationLink(officeEmail: string, token: string, tokenId: string) {
-  try {
-    const verificationUrl = `${env.SERVER_URL}/long-form/verification/verify-office-email/${tokenId}@${token}`
-    const emailHtml = await renderVerificationLinkEmail({ verificationUrl });
-    const subject = `Verify your email`;
-
-    await transporter.sendMail({
-      from: env.GMAIL_ID,
-      to: officeEmail,
-      subject,
-      html: emailHtml
-    });
-
-    return { message: 'Verification link sent' };
   }
   catch (e) {
     console.log(e);

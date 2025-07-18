@@ -1,9 +1,8 @@
 import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
-import { tokenTable } from "@/db/schemas/token"
 import ApiError from "@/lib/error-handler"
-import { generateOtp, generateVerificationToken } from "@/utils"
-import { saveToken, sendEmailOtp, sendMobileOtp, sendOfficialMailVerificationLink, verifyOfficialEmail, verifyToken } from "@/verification-service"
+import { generateOtp } from "@/utils"
+import { saveToken, sendEmailOtp, sendMobileOtp, verifyToken } from "@/verification-service"
 import { eq } from "drizzle-orm"
 import HttpStatus from "http-status"
 import { createCookieType } from "./schema"
@@ -37,7 +36,7 @@ export async function verifyMobileOtpService(id: any, data: any) {
     .set({ isMobileOtpVerified: true })
     .where(eq(longFormTable.id, id))
 
-  return { message: "OTP verified", data: null, verificationSuccessful: true }
+  return { message: "OTP verified", data: { verificationSuccessful: true } }
 }
 
 export async function sendEmailOtpService(id: string) {
@@ -70,45 +69,26 @@ export async function verifyEmailOtpService(id: any, otp: string) {
     .set({ isPersonalEmailOtpVerified: true })
     .where(eq(longFormTable.id, id))
 
-  return { message: "OTP verified", data: null, verificationSuccessful: true }
+  return { message: "OTP verified", data: { verificationSuccessful: true } }
 }
 
-export async function sendOfficialMailVerificationLinkService(id: string) {
-  const [{ officeEmail }] = await db
-    .select({
-      officeEmail: longFormTable.officeEmail
-    })
-    .from(longFormTable)
-    .where(eq(longFormTable.id, id))
+// export async function verifyOfficialEmailService(param: string) {
+//   const [id, token] = param.split('@', 2)
 
-  if (!officeEmail) {
-    throw new ApiError(HttpStatus.NOT_FOUND, 'User not found')
-  }
+//   const [row] = await db
+//     .select()
+//     .from(tokenTable)
+//     .where(eq(tokenTable.id, id))
 
-  const token = generateVerificationToken()
-  const tokenId = await saveToken(officeEmail as string, token, new Date(Date.now() + 24 * 60 * 60 * 1000)) // 24 hours
-  await sendOfficialMailVerificationLink(officeEmail, token, tokenId)
+//   await verifyOfficialEmail(id, token)
 
-  return { message: 'Verification mail sent!', data: null }
-}
+//   await db
+//     .update(longFormTable)
+//     .set({ isOfficeEmailVerified: true })
+//     .where(eq(longFormTable.officeEmail, row.target))
 
-export async function verifyOfficialEmailService(param: string) {
-  const [id, token] = param.split('@', 2)
-
-  const [row] = await db
-    .select()
-    .from(tokenTable)
-    .where(eq(tokenTable.id, id))
-
-  await verifyOfficialEmail(id, token)
-
-  await db
-    .update(longFormTable)
-    .set({ isOfficeEmailVerified: true })
-    .where(eq(longFormTable.officeEmail, row.target))
-
-  return { message: "Office email verified", data: null }
-}
+//   return { message: "Office email verified", data: null }
+// }
 
 
 

@@ -12,13 +12,6 @@ export const step1Schema = yup.object({
 }).stripUnknown()
 export type step1Type = yup.InferType<typeof step1Schema>
 
-// export const step2Schema = yup.object({
-//   personalEmail: yup.string().required().trim().email(),
-// officeEmail: yup.string().trim().email(),
-// officeEmailVerificationLinkSent: yup.boolean().required()
-// }).stripUnknown()
-// export type step2Type = yup.InferType<typeof step2Schema>
-
 export const step2Schema = yup.object({
   address1: yup.string().required().trim(),
   address2: yup.string().trim(),
@@ -54,12 +47,13 @@ export const step4Schema = yup.object({
     .array()
     .min(1)
     .max(3)
-    .required()
+    .required(),
+  employmentProofDocument: yup.mixed()
 }).stripUnknown()
 export type step4Type = yup.InferType<typeof step4Schema>
 
 export const employmentProofSchema = yup.object({
-  document: yup.mixed()
+  employmentProofDocument: yup.mixed()
 }).stripUnknown()
 export type employmentProofType = yup.InferType<typeof employmentProofSchema>
 

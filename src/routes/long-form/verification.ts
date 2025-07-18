@@ -26,7 +26,7 @@ app.put(
     limit: 5,
     standardHeaders: "draft-6",
     keyGenerator: (c) => {
-      return "long-form-" + c.get("jwtPayload").id;
+      return "long-form-phone-" + c.get("jwtPayload").id;
     },
   }),
   async (c) => {
@@ -39,7 +39,7 @@ app.put(
 
 // verify phone otp
 app.put(
-  "/verify-phone-otp",
+  "/verify-phone",
   jwt({
     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
     cookie: env.COOKIE_NAME,
@@ -61,6 +61,15 @@ app.put(
     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
     cookie: env.COOKIE_NAME
   }),
+  rateLimiter({
+    handler: (c) => c.json({ message: HttpStatus[429], data: null }, 429),
+    windowMs: 1000 * 60,
+    limit: 5,
+    standardHeaders: "draft-6",
+    keyGenerator: (c) => {
+      return "long-form-email-" + c.get("jwtPayload").id;
+    },
+  }),
   yupValidator("json", getEmailOtpSchema),
   async (c) => {
     const { email } = c.req.valid("json")
@@ -79,7 +88,7 @@ app.put(
 
 // verify email otp
 app.put(
-  "/verify-email-otp",
+  "/verify-email",
   jwt({
     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
     cookie: env.COOKIE_NAME

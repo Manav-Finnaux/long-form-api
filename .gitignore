@@ -3,7 +3,7 @@
 node_modules/
 drizzle-mysql.config.ts
 drizzle-postgres.config.ts
-drizzle/
+drizzle
 
 /src/migrate/
 /src/playground/

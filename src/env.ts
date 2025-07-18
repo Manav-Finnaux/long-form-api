@@ -11,10 +11,16 @@ const envSchema = yup.object({
     // FINNAUX_APPLICATION_STATEMENT_URL: yup.string().trim().required().url(),
     // FINNAUX_APPLICATION_CLOSURE_URL: yup.string().trim().required().url(),
     COOKIE_NAME: yup.string().trim().required(),
-    GMAIL_ID: yup.string().email().required(),
-    GOOGLE_APP_PASSWORD: yup.string().required(),
     SERVER_URL: yup.string().required(),
     UI_URL: yup.string().required(),
+
+    EMAIL_ID: yup.string().email().required(),
+    EMAIL_REGION: yup.string().required(),
+    AWS_SES_SECRET_ACCESS_KEY: yup.string().required(),
+    AWS_SES_ACCESS_KEY_ID: yup.string().required(),
+
+    // GMAIL_ID: yup.string().email().required(),
+    // GOOGLE_APP_PASSWORD: yup.string().required(),
 })
 
 //For node js and bun js runtime

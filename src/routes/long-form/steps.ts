@@ -8,6 +8,7 @@ import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
 import { employmentProofSchema, employmentProofType, step1Schema, step1Type, step2Schema, step2Type, step3Schema, step3Type, step4Schema, step4Type, step5Schema, step5Type, step6Schema, step6Type } from "./schema"
 import { storeFile } from "@/utils"
+import ApiError from "@/lib/error-handler"
 
 const app = new Hono()
 
@@ -32,43 +33,6 @@ app.post(
 
     return c.json({ message: "Data saved successfully" }, HttpStatus.OK)
   }
-  // async (c) => {
-  //   const existingSession = getCookie(c, env.COOKIE_NAME);
-  //   const data: step1Type = c.req.valid("json");
-
-  //   let existingUserId = null;
-  //   if (existingSession) {
-  //     try {
-  //       const decoded = await verify(
-  //         existingSession,
-  //         env.ANONYMOUS_CUSTOMER_JWT_SECRET
-  //       );
-  //       console.log('existing session detected: ', decoded)
-  //       existingUserId = decoded.id as string;
-  //     } catch (err) { }
-  //   }
-  //   let result = null;
-
-  //   if (existingUserId) {
-  //     result = await updateStep1DataService(existingUserId, data, 1)
-  //   } else {
-  //     result = await saveStep1DataService(data, 1);
-
-  //     const jwt = await sign(
-  //       { id: result.data.id },
-  //       env.ANONYMOUS_CUSTOMER_JWT_SECRET
-  //     );
-
-  //     setCookie(c, env.COOKIE_NAME, jwt, {
-  //       secure: true,
-  //       httpOnly: true,
-  //       sameSite: "none",
-  //       expires: new Date(Date.now() + 1000 * 60 * 30), // 30 minutes
-  //     });
-  //   }
-
-  //   return c.json(result, HttpStatus.OK);
-  // }
 )
 
 // app.post(
@@ -163,29 +127,46 @@ app.post(
     const data: step4Type = c.req.valid("json")
     const id: string = c.get('jwtPayload').id
 
-    // save salary slips
-    const salarySlipPaths = await Promise.all(
-      data.salarySlips.map(async (salarySlip) => {
-        const res = await storeFile(salarySlip as [string, string], id) // salarySlip as [base64, fileName]
+    await db.transaction(
+      async (tx) => {
+        const [{ isOfficeEmailVerified }] = await tx.select({ isOfficeEmailVerified: longFormTable.isOfficeEmailVerified }).from(longFormTable).where(eq(longFormTable.id, id))
 
-        return res.filePath
-      })
+        if (!isOfficeEmailVerified && !data.employmentProofDocument) {
+          throw new ApiError(HttpStatus.BAD_REQUEST, 'Either verify office email or provide document proof.')
+        }
+
+        // save salary slips
+        const salarySlipPaths = await Promise.all(
+          data.salarySlips.map(async (salarySlip) => {
+            const res = await storeFile(salarySlip as [string, string], id) // salarySlip as [base64, fileName]
+
+            return res.filePath
+          })
+        )
+
+        let employmentProofDocument = null;
+        if (data.employmentProofDocument) {
+          const { filePath } = await storeFile(data.employmentProofDocument, id)
+          employmentProofDocument = filePath;
+        }
+
+        await tx
+          .update(longFormTable)
+          .set({
+            ...data,
+            salarySlips: salarySlipPaths,
+            employmentProofDocument,
+          })
+          .where(eq(longFormTable.id, id))
+      }
     )
-
-    await db
-      .update(longFormTable)
-      .set({
-        ...data,
-        salarySlips: salarySlipPaths
-      })
-      .where(eq(longFormTable.id, id))
 
     return c.json({ message: 'Data saved successfully' }, HttpStatus.OK)
   }
 )
 
 app.post(
-  "employment-proof",
+  "/employment-proof",
   jwt({
     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
     cookie: env.COOKIE_NAME
@@ -195,7 +176,7 @@ app.post(
     const data: employmentProofType = c.req.valid("json");
     const id = c.get("jwtPayload").id
 
-    const { filePath: documentPath } = await storeFile(data.document, id)
+    const { filePath: documentPath } = await storeFile(data.employmentProofDocument, id)
 
     await db.update(longFormTable).set({ employmentProofDocument: documentPath }).where(eq(longFormTable.id, id))
 
