@@ -48,7 +48,7 @@ export const step4Schema = yup.object({
     .min(1)
     .max(3)
     .required(),
-  employmentProofDocument: yup.mixed()
+  // employmentProofDocument: yup.mixed()
 }).stripUnknown()
 export type step4Type = yup.InferType<typeof step4Schema>
 
@@ -79,7 +79,8 @@ export const step6Schema = yup.object({
 export type step6Type = yup.InferType<typeof step6Schema>
 
 export const verifyTokenSchema = yup.object({
-  token: yup.string().required(),
+  otp: yup.string().required(),
+  isPersonal: yup.boolean().required()
 })
 
 export const getMobileOtpSchema = yup.object({
@@ -88,6 +89,7 @@ export const getMobileOtpSchema = yup.object({
 
 export const getEmailOtpSchema = yup.object({
   email: yup.string().required().trim().email(),
+  isPersonal: yup.boolean().required(),
 })
 
 export const createCookieSchema = yup.object({

@@ -2,11 +2,9 @@ import { db } from "@/db";
 import { tokenTable } from "@/db/schemas/token";
 import { env } from "@/env";
 import ApiError from "@/lib/error-handler";
-import { compareHash, getHashedValue } from "@/utils";
-import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { compareHash, getHashedValue, transporter } from "@/utils";
 import axios from "axios";
 import { eq } from "drizzle-orm";
-import nodemailer from 'nodemailer';
 import { renderOtpEmail } from "./email-template";
 
 export async function saveToken(target: string, otp: string, otpExpireAt: Date) {
@@ -44,27 +42,6 @@ export async function verifyToken(token: string, target: string) {
   return true;
 }
 
-export async function verifyOfficialEmail(id: string, token: string) {
-  const [row] = await db.select().from(tokenTable).where(eq(tokenTable.id, id))
-
-  if (!row) {
-    throw new ApiError(400, "Token not found");
-  }
-  if (new Date(row.tokenExpireAt) < new Date()) {
-    throw new ApiError(400, "Token expired, please generate new token.");
-  }
-
-  const isValid = await compareHash(token, row.token);
-  if (!isValid) {
-    throw new ApiError(400, "Invalid OTP");
-  }
-
-  const [magicLinkRow] = await db.delete(tokenTable).where(eq(tokenTable.id, id)).returning()
-  console.log({ magicLinkRow })
-
-  return true;
-}
-
 export async function sendMobileOtp(mobileNo: string, otp: string) {
   // extract these to .env OR even better, create a table and store it there
   const key = '9997e7329aa372c275648410a5637f64'
@@ -77,26 +54,14 @@ export async function sendMobileOtp(mobileNo: string, otp: string) {
   axios.get(url);
 }
 
-const sesClient = new SESv2Client({
-  region: env.EMAIL_REGION,
-  credentials: {
-    accessKeyId: env.AWS_SES_ACCESS_KEY_ID,
-    secretAccessKey: env.AWS_SES_SECRET_ACCESS_KEY
-  }
-})
-
-const transporter = nodemailer.createTransport({
-  SES: { sesClient, SendEmailCommand }
-})
-
-export async function sendEmailOtp(personalEmail: string, otp: string) {
+export async function sendEmailOtp(receiverEmailID: string, otp: string) {
   try {
     const emailHtml = await renderOtpEmail({ otp });
     const subject = `Your OTP code`;
 
     await transporter.sendMail({
       from: env.EMAIL_ID,
-      to: personalEmail,
+      to: receiverEmailID,
       subject,
       html: emailHtml
     });

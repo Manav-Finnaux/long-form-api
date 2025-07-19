@@ -1,11 +1,13 @@
 import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
 import ApiError from "@/lib/error-handler"
-import { generateOtp } from "@/utils"
+import { generateOtp, transporter } from "@/utils"
 import { saveToken, sendEmailOtp, sendMobileOtp, verifyToken } from "@/verification-service"
 import { eq } from "drizzle-orm"
 import HttpStatus from "http-status"
 import { createCookieType } from "./schema"
+import { env } from "@/env"
+import { renderOtpEmail } from "@/verification-service/email-template"
 
 export async function sendMobileOtpService(id: string) {
   const [row] = await db
@@ -30,7 +32,7 @@ export async function verifyMobileOtpService(id: any, data: any) {
     .from(longFormTable)
     .where(eq(longFormTable.id, id))
 
-  await verifyToken(data.token as string, row.mobileNo as string)
+  await verifyToken(data.otp as string, row.mobileNo as string)
   await db
     .update(longFormTable)
     .set({ isMobileOtpVerified: true })
@@ -39,89 +41,50 @@ export async function verifyMobileOtpService(id: any, data: any) {
   return { message: "OTP verified", data: { verificationSuccessful: true } }
 }
 
-export async function sendEmailOtpService(id: string) {
+export async function sendEmailOtpService(id: string, isPersonal: boolean) {
   const [row] = await db
-    .select({ personalEmail: longFormTable.personalEmail })
+    .select({ email: isPersonal ? longFormTable.personalEmail : longFormTable.officeEmail })
     .from(longFormTable)
     .where(eq(longFormTable.id, id))
 
-  if (!row?.personalEmail) {
+  if (!row?.email) {
     throw new ApiError(404, "User not found")
   }
 
   const otp = generateOtp()
-  await sendEmailOtp(row.personalEmail, otp)
-  await saveToken(row.personalEmail, otp, new Date(Date.now() + 5 * 60 * 1000)) // 5 minutes
+  await sendEmailOtp(row.email, otp)
+  await saveToken(row.email, otp, new Date(Date.now() + 5 * 60 * 1000)) // 5 minutes
 
   return { message: "OTP Sent!", data: null }
 }
 
-export async function verifyEmailOtpService(id: any, otp: string) {
+type VerifyEmailOtpServiceType = {
+  id: string
+  otp: string
+  isPersonal: boolean
+}
+export async function verifyEmailOtpService({ id, otp, isPersonal }: VerifyEmailOtpServiceType) {
   const [row] = await db
-    .select({ personalEmail: longFormTable.personalEmail })
+    .select({ email: isPersonal ? longFormTable.personalEmail : longFormTable.officeEmail })
     .from(longFormTable)
     .where(eq(longFormTable.id, id))
 
-  await verifyToken(otp, row.personalEmail as string)
+  await verifyToken(otp, row.email as string)
 
   await db
     .update(longFormTable)
-    .set({ isPersonalEmailOtpVerified: true })
+    .set(isPersonal ? { isPersonalEmailOtpVerified: true } : { isOfficeEmailVerified: true })
     .where(eq(longFormTable.id, id))
 
   return { message: "OTP verified", data: { verificationSuccessful: true } }
 }
 
-// export async function verifyOfficialEmailService(param: string) {
-//   const [id, token] = param.split('@', 2)
-
-//   const [row] = await db
-//     .select()
-//     .from(tokenTable)
-//     .where(eq(tokenTable.id, id))
-
-//   await verifyOfficialEmail(id, token)
-
-//   await db
-//     .update(longFormTable)
-//     .set({ isOfficeEmailVerified: true })
-//     .where(eq(longFormTable.officeEmail, row.target))
-
-//   return { message: "Office email verified", data: null }
-// }
-
-
-
-// export async function saveStep1DataService(data: step1Type, step: number) {
-//   return await db.transaction(async (tx) => {
-//     const rows = await tx.insert(longFormTable).values(data).returning({ id: longFormTable.id })
-
-//     return step === 1 ? { message: "data added successfully", data: rows[0], sendOtp: true } : { message: "data added successfully", data: rows[0] }
-//   })
-// }
-
-// export async function updateStep1DataService(id: string, data: step1Type, step: number) {
-//   const row = await db
-//     .select({
-//       mobileNo: longFormTable.mobileNo,
-//       isMobileOtpVerified: longFormTable.isMobileOtpVerified
-//     })
-//     .from(longFormTable)
-//     .where(eq(longFormTable.id, id))
-
-//   if (row.length === 0) throw new ApiError(HttpStatus.NOT_FOUND, 'User not found')
-
-//   const isMobileOtpVerified = row[0]?.mobileNo === data.mobileNo ? row[0]?.isMobileOtpVerified : false
-
-//   await db
-//     .update(longFormTable)
-//     .set({ ...data, isMobileOtpVerified })
-//     .where(eq(longFormTable.id, id))
-
-//   return step === 1 ? { message: "User updated", data: null, sendOtp: isMobileOtpVerified } : { message: "User updated", data: null }
-// }
-
-export async function savePersonalEmailService(id: string, personalEmail: string) {
+type SaveEmailServiceType = {
+  id: string
+  email: string
+  isPersonal: boolean
+}
+export async function saveEmailService({ id, email, isPersonal }: SaveEmailServiceType) {
   await db.transaction(async (tx) => {
     const [isMobileVerified] = await tx.select({ isMobileVerified: longFormTable.isMobileOtpVerified }).from(longFormTable)
 
@@ -129,12 +92,19 @@ export async function savePersonalEmailService(id: string, personalEmail: string
       throw new ApiError(HttpStatus.BAD_REQUEST, "Mobile number is not verified.")
     }
 
+    const emailData = isPersonal ?
+      {
+        personalEmail: email,
+        isPersonalEmailOtpVerified: false
+      } :
+      {
+        officeEmail: email,
+        isOfficeEmailVerified: false
+      };
+
     await tx
       .update(longFormTable)
-      .set({
-        personalEmail,
-        isPersonalEmailOtpVerified: false
-      })
+      .set(emailData)
       .where(eq(longFormTable.id, id))
       .returning({
         id: longFormTable.id,
@@ -142,23 +112,10 @@ export async function savePersonalEmailService(id: string, personalEmail: string
       })
   })
 
-  return { message: "Personal email added", data: { sendOtp: true } }
-}
-
-export async function saveOfficeEmailService(id: string, officeEmail: string) {
-  await db
-    .update(longFormTable)
-    .set({
-      officeEmail,
-      isOfficeEmailVerified: false
-    })
-    .where(eq(longFormTable.id, id))
-    .returning({
-      id: longFormTable.id,
-      officeEmail: longFormTable.officeEmail,
-    })
-
-  return { message: "Office email added", data: { sendVerificationLink: true } }
+  return {
+    message: `${isPersonal ? "Personal" : "Office"} email added`,
+    data: { sendOtp: true }
+  }
 }
 
 export async function savePhoneNumber(data: createCookieType): Promise<{ id: string }> {
@@ -175,4 +132,22 @@ export async function updatePhoneNumber(id: string, data: createCookieType) {
     .returning({ id: longFormTable.id })
 
   return { id: rows[0].id }
+}
+
+export async function sendConfirmationEmail(id: string) {
+  const [emails] = await db
+    .select({ personalEmail: longFormTable.personalEmail, officeEmail: longFormTable.officeEmail })
+    .from(longFormTable)
+    .where(eq(longFormTable.id, id))
+
+  const confirmationEmailTemplateHtml = await renderOtpEmail({ otp: '123456', name: 'Final Submit Received' })
+
+  await transporter.sendMail({
+    from: env.EMAIL_ID,
+    to: emails.personalEmail!,
+    subject: 'Your Form Has Been Successfully Submitted',
+    html: confirmationEmailTemplateHtml
+  })
+
+  return { message: "Confirmation Email Sent" }
 }

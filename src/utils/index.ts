@@ -5,6 +5,9 @@ import { existsSync } from "fs"
 import { mkdir, writeFile } from "fs/promises"
 import otpGenerator from "otp-generator"
 import { dirname } from "path"
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+import nodemailer from 'nodemailer';
+import { env } from "@/env"
 
 export function generateOtp() {
   return otpGenerator.generate(6, {
@@ -55,3 +58,15 @@ export async function storeFile(file: [string, string], id: string) {
     throw new ApiError(500, error.message ? `Failed to save file: ${error.message}` : 'Unknown Error')
   }
 }
+
+const sesClient = new SESv2Client({
+  region: env.EMAIL_REGION,
+  credentials: {
+    accessKeyId: env.AWS_SES_ACCESS_KEY_ID,
+    secretAccessKey: env.AWS_SES_SECRET_ACCESS_KEY
+  }
+})
+
+export const transporter = nodemailer.createTransport({
+  SES: { sesClient, SendEmailCommand }
+})

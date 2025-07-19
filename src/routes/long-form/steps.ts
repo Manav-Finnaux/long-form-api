@@ -2,13 +2,13 @@ import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
 import { env } from "@/env"
 import { yupValidator } from "@/lib/yup/validator"
+import { storeFile } from "@/utils"
 import { eq } from "drizzle-orm"
 import { Hono } from "hono"
 import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
 import { employmentProofSchema, employmentProofType, step1Schema, step1Type, step2Schema, step2Type, step3Schema, step3Type, step4Schema, step4Type, step5Schema, step5Type, step6Schema, step6Type } from "./schema"
-import { storeFile } from "@/utils"
-import ApiError from "@/lib/error-handler"
+import { sendConfirmationEmail } from "./services"
 
 const app = new Hono()
 
@@ -127,46 +127,28 @@ app.post(
     const data: step4Type = c.req.valid("json")
     const id: string = c.get('jwtPayload').id
 
-    await db.transaction(
-      async (tx) => {
-        const [{ isOfficeEmailVerified }] = await tx.select({ isOfficeEmailVerified: longFormTable.isOfficeEmailVerified }).from(longFormTable).where(eq(longFormTable.id, id))
+    const salarySlipPaths = await Promise.all(
+      data.salarySlips.map(async (salarySlip) => {
+        const res = await storeFile(salarySlip as [string, string], id) // salarySlip as [base64, fileName]
 
-        if (!isOfficeEmailVerified && !data.employmentProofDocument) {
-          throw new ApiError(HttpStatus.BAD_REQUEST, 'Either verify office email or provide document proof.')
-        }
-
-        // save salary slips
-        const salarySlipPaths = await Promise.all(
-          data.salarySlips.map(async (salarySlip) => {
-            const res = await storeFile(salarySlip as [string, string], id) // salarySlip as [base64, fileName]
-
-            return res.filePath
-          })
-        )
-
-        let employmentProofDocument = null;
-        if (data.employmentProofDocument) {
-          const { filePath } = await storeFile(data.employmentProofDocument, id)
-          employmentProofDocument = filePath;
-        }
-
-        await tx
-          .update(longFormTable)
-          .set({
-            ...data,
-            salarySlips: salarySlipPaths,
-            employmentProofDocument,
-          })
-          .where(eq(longFormTable.id, id))
-      }
+        return res.filePath
+      })
     )
+
+    await db
+      .update(longFormTable)
+      .set({
+        ...data,
+        salarySlips: salarySlipPaths,
+      })
+      .where(eq(longFormTable.id, id))
 
     return c.json({ message: 'Data saved successfully' }, HttpStatus.OK)
   }
 )
 
 app.post(
-  "/employment-proof",
+  "/4b",
   jwt({
     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
     cookie: env.COOKIE_NAME
@@ -224,6 +206,8 @@ app.post(
       .update(longFormTable)
       .set(data)
       .where(eq(longFormTable.id, id))
+
+    await sendConfirmationEmail(id)
 
     return c.json({ message: 'Data saved successfully' }, HttpStatus.OK)
   }
