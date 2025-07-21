@@ -6,6 +6,7 @@ import { compareHash, getHashedValue, transporter } from "@/utils";
 import axios from "axios";
 import { eq } from "drizzle-orm";
 import { renderOtpEmail } from "./email-template";
+import { smsConfig } from "@/db/schemas/sms-config";
 
 export async function saveToken(target: string, otp: string, otpExpireAt: Date) {
   const hashedOtp = await getHashedValue(otp);
@@ -43,12 +44,14 @@ export async function verifyToken(token: string, target: string) {
 }
 
 export async function sendMobileOtp(mobileNo: string, otp: string) {
-  // extract these to .env OR even better, create a table and store it there
-  const key = '9997e7329aa372c275648410a5637f64'
-  const route = '1'
-  const senderId = 'MSFINP'
-  const sms = "{otp} is your OTP for Finnaux Login. Never disclose this OTP with anybody else. MSFIN Credit Pvt Ltd ".replace("{otp}", otp);
-  const templateId = '1407170970390002027'
+  const [{ key, route, senderId, template, templateId }] = await db.select().from(smsConfig);
+
+  if ([key, route, senderId, template, templateId].some(value => value == null)) {
+    throw new Error('One or more required fields are null or undefined');
+  }
+
+  const sms = template!.replace("{#var#}", otp)
+
   const url = `http://sms.par-ken.com/api/smsapi?key=${key}&route=${route}&sender=${senderId}&number=${mobileNo}(s)&sms=${sms}&templateid=${templateId}`
 
   axios.get(url);
