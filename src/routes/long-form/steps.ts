@@ -9,6 +9,7 @@ import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
 import { employmentProofSchema, employmentProofType, step1Schema, step1Type, step2Schema, step2Type, step3Schema, step3Type, step4Schema, step4Type, step5Schema, step5Type, step6Schema, step6Type } from "./schema"
 import { sendConfirmationEmail } from "./services"
+import ApiError from "@/lib/error-handler"
 
 const app = new Hono()
 
@@ -23,13 +24,22 @@ app.post(
   }),
   yupValidator("json", step1Schema),
   async (c) => {
-    const data: step1Type = c.req.valid("json")
+    // const data: step1Type = c.req.valid("json")
     const id = c.get("jwtPayload").id
 
-    await db
-      .update(longFormTable)
-      .set(data)
-      .where(eq(longFormTable.id, id))
+    const noData = (await db
+      .select({
+        name: longFormTable.name,
+        fatherName: longFormTable.fatherName,
+        dob: longFormTable.dob,
+        gender: longFormTable.gender
+      })
+      .from(longFormTable)
+      .where(eq(longFormTable.id, id))).length === 0
+
+    if (noData) {
+      throw new ApiError(HttpStatus.NOT_FOUND, "User data not found")
+    }
 
     return c.json({ message: "Data saved successfully" }, HttpStatus.OK)
   }

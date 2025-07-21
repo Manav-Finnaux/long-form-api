@@ -118,16 +118,16 @@ export async function saveEmailService({ id, email, isPersonal }: SaveEmailServi
   }
 }
 
-export async function savePhoneNumber(data: createCookieType): Promise<{ id: string }> {
+export async function saveStep1Data(data: createCookieType): Promise<{ id: string }> {
   const rows = await db.insert(longFormTable).values(data).returning({ id: longFormTable.id })
 
   return { id: rows[0].id }
 }
 
-export async function updatePhoneNumber(id: string, data: createCookieType) {
-  const rows = await db.update(longFormTable).set({
-    mobileNo: data.mobileNo
-  })
+export async function updateStep1Data(id: string, data: createCookieType) {
+  const rows = await db
+    .update(longFormTable)
+    .set(data)
     .where(eq(longFormTable.id, id))
     .returning({ id: longFormTable.id })
 

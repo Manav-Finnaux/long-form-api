@@ -7,7 +7,7 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie"
 import HttpStatus from "http-status"
 import { yupValidator } from "@/lib/yup/validator"
 import { createCookieSchema, createCookieType } from "./schema"
-import { savePhoneNumber, updatePhoneNumber } from "./services"
+import { saveStep1Data, updateStep1Data } from "./services"
 
 const app = new Hono()
 
@@ -37,9 +37,9 @@ app.put(
     let result = null;
 
     if (existingUserId) {
-      result = await updatePhoneNumber(existingUserId, data)
+      result = await updateStep1Data(existingUserId, data)
     } else {
-      result = await savePhoneNumber(data);
+      result = await saveStep1Data(data);
 
       const jwt = await sign(
         { id: result.id },

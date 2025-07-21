@@ -7,8 +7,6 @@ export const step1Schema = yup.object({
   fatherName: yup.string().required().trim(),
   dob: yup.string().datetime().required(),
   gender: yup.string().oneOf(GENDER_VALUES).required(),
-  // mobileNo: yup.string().matches(Regex.PHONE_NUMBER, "Invalid Phone Number"),
-  // personalEmail: yup.string().trim().email(),
 }).stripUnknown()
 export type step1Type = yup.InferType<typeof step1Schema>
 
@@ -93,6 +91,10 @@ export const getEmailOtpSchema = yup.object({
 })
 
 export const createCookieSchema = yup.object({
+  name: yup.string().required().trim(),
+  fatherName: yup.string().required().trim(),
+  dob: yup.string().datetime().required(),
+  gender: yup.string().oneOf(GENDER_VALUES).required(),
   mobileNo: yup.string().matches(Regex.PHONE_NUMBER, "Invalid Phone Number").required(),
 })
 export type createCookieType = yup.InferType<typeof createCookieSchema>
