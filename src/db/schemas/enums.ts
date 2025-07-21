@@ -10,14 +10,14 @@ import { createEnum } from "../util"
 //     values: ["PENDING", "CALLED", "PROCESSED"]
 // })
 
-// export const {
-//     enum: ApplicationStatusEnum,
-//     values: APPLICATION_STATUS_VALUES,
-//     pgEnum: applicationStatusEnum
-// } = createEnum({
-//     name: "applicationStatus",
-//     values: ["PENDING", "IN_PROGRESS", "REJECTED", "COMPLETED", "CLOSED", "HOLD"]
-// })
+export const {
+    enum: ApplicationStatusEnum,
+    values: APPLICATION_STATUS_VALUES,
+    pgEnum: applicationStatusEnum
+} = createEnum({
+    name: "applicationStatus",
+    values: ["PENDING", "IN_PROGRESS", "REJECTED", "COMPLETED", "CLOSED", "HOLD"]
+})
 
 export const {
     enum: GenderEnum,

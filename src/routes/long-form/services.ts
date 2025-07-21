@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm"
 import HttpStatus from "http-status"
 import { createCookieType } from "./schema"
 import { env } from "@/env"
-import { renderOtpEmail } from "@/verification-service/email-template"
+import { renderConfirmationEmail, renderOtpEmail } from "@/verification-service/email-template"
 
 export async function sendMobileOtpService(id: string) {
   const [row] = await db
@@ -43,16 +43,16 @@ export async function verifyMobileOtpService(id: any, data: any) {
 
 export async function sendEmailOtpService(id: string, isPersonal: boolean) {
   const [row] = await db
-    .select({ email: isPersonal ? longFormTable.personalEmail : longFormTable.officeEmail })
+    .select({ name: longFormTable.name, email: isPersonal ? longFormTable.personalEmail : longFormTable.officeEmail })
     .from(longFormTable)
     .where(eq(longFormTable.id, id))
 
-  if (!row?.email) {
+  if (!row?.email || !row.name) {
     throw new ApiError(404, "User not found")
   }
 
   const otp = generateOtp()
-  await sendEmailOtp(row.email, otp)
+  await sendEmailOtp(row.email, row.name, otp)
   await saveToken(row.email, otp, new Date(Date.now() + 5 * 60 * 1000)) // 5 minutes
 
   return { message: "OTP Sent!", data: null }
@@ -135,17 +135,21 @@ export async function updatePhoneNumber(id: string, data: createCookieType) {
 }
 
 export async function sendConfirmationEmail(id: string) {
-  const [emails] = await db
-    .select({ personalEmail: longFormTable.personalEmail, officeEmail: longFormTable.officeEmail })
+  const [data] = await db
+    .select({ personalEmail: longFormTable.personalEmail, name: longFormTable.name })
     .from(longFormTable)
     .where(eq(longFormTable.id, id))
 
-  const confirmationEmailTemplateHtml = await renderOtpEmail({ otp: '123456', name: 'Final Submit Received' })
+  if (!data.name || !data.personalEmail) {
+    throw new ApiError(HttpStatus.NOT_FOUND, "User not found")
+  }
+
+  const confirmationEmailTemplateHtml = await renderConfirmationEmail(data.name)
 
   await transporter.sendMail({
-    from: env.EMAIL_ID,
-    to: emails.personalEmail!,
-    subject: 'Your Form Has Been Successfully Submitted',
+    from: `Northwestern Finance <${env.EMAIL_ID}>`,
+    to: data.personalEmail,
+    subject: 'Review in progress',
     html: confirmationEmailTemplateHtml
   })
 

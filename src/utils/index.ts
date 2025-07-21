@@ -4,10 +4,11 @@ import { randomBytes } from "crypto"
 import { existsSync } from "fs"
 import { mkdir, writeFile } from "fs/promises"
 import otpGenerator from "otp-generator"
-import { dirname } from "path"
+import path, { dirname } from "path"
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 import nodemailer from 'nodemailer';
 import { env } from "@/env"
+import fs from "fs/promises"
 
 export function generateOtp() {
   return otpGenerator.generate(6, {
@@ -70,3 +71,28 @@ const sesClient = new SESv2Client({
 export const transporter = nodemailer.createTransport({
   SES: { sesClient, SendEmailCommand }
 })
+
+async function getData(src: string) {
+  const file = (await fs.readFile(src)).toString('base64')
+  const fileName = path.basename(src)
+
+  return [file, fileName]
+}
+
+export async function filePathToBase64(src: string | null) {
+  if (!src || src.length === 0) return null;
+
+  return await getData(src)
+}
+
+export async function filePathArrayToBase64(src: string[] | null) {
+  if (!src || src.length === 0) return null;
+
+  const returnValue = await Promise.all(src.map(
+    async (src) => {
+      return await getData(src)
+    }
+  ))
+
+  return returnValue
+}

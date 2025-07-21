@@ -12,6 +12,7 @@ import httpStatus from "http-status";
 import { env } from "./env";
 import { location } from "./routes/location";
 import { longForm } from "./routes/long-form";
+import { finnaux } from "./routes/finnaux";
 
 const app = new Hono();
 const PORT = env.PORT;
@@ -47,7 +48,8 @@ app.get("/", (c) => {
 app
   .basePath("/api")
   .route("/long-form", longForm)
-  .route("/location", location);
+  .route("/location", location)
+  .route("/finnaux", finnaux);
 
 app.onError((err, c) => {
   console.log({ err });

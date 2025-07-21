@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { InferSelectModel, sql } from "drizzle-orm";
 import { pgTable } from "drizzle-orm/pg-core";
 import { encryptedText } from "../custom-data-types";
 import { genderEnum } from "./enums";
@@ -60,3 +60,5 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     createdAt: db.timestamp({ mode: "string", withTimezone: true }).defaultNow(),
     updatedAt: db.timestamp({ mode: "string", withTimezone: true }).$onUpdateFn(() => sql`now()`)
 }))
+
+export type LongFormTableType = InferSelectModel<typeof longFormTable>

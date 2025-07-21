@@ -54,13 +54,13 @@ export async function sendMobileOtp(mobileNo: string, otp: string) {
   axios.get(url);
 }
 
-export async function sendEmailOtp(receiverEmailID: string, otp: string) {
+export async function sendEmailOtp(receiverEmailID: string, name: string, otp: string) {
   try {
-    const emailHtml = await renderOtpEmail({ otp });
+    const emailHtml = await renderOtpEmail({ otp, name });
     const subject = `Your OTP code`;
 
     await transporter.sendMail({
-      from: env.EMAIL_ID,
+      from: `Northwestern Finance <${env.EMAIL_ID}>`,
       to: receiverEmailID,
       subject,
       html: emailHtml
