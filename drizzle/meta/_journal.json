@@ -36,6 +36,20 @@
       "when": 1753099965940,
       "tag": "0004_regular_ender_wiggin",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1753179364224,
+      "tag": "0005_breezy_crusher_hogan",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1753189319671,
+      "tag": "0006_tranquil_susan_delgado",
+      "breakpoints": true
     }
   ]
 }

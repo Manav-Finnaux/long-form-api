@@ -1,9 +1,8 @@
 import { db } from "@/db";
-import { finnauxData } from "@/db/schemas/finnaux";
 import { longFormTable, LongFormTableType } from "@/db/schemas/long-form";
 import { yupValidator } from "@/lib/yup/validator";
 import { filePathArrayToBase64, filePathToBase64 } from "@/utils";
-import { and, eq, getTableColumns, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { Hono } from "hono";
 import HttpStatus from "http-status";
 import { sendConfirmationEmail } from "../long-form/services";
@@ -24,35 +23,20 @@ interface UpdatedLongFormType extends Omit<LongFormTableType, 'profilePicture' |
 const app = new Hono()
 
 app.get(
-  "/test",
-  async (c) => {
-    await sendConfirmationEmail("63d12150-1ba0-4799-bf32-c0df783e1cff")
-
-    return c.json({ msg: "Test route" }, HttpStatus.OK)
-  }
-)
-
-app.get(
   "/",
   yupValidator("query", getLongFormData),
   async (c) => {
     const query: getLongFormDataType = c.req.valid("query");
 
     const data: any[] = await db
-      .select({
-        ...getTableColumns(finnauxData),
-        ...getTableColumns(longFormTable),
-      })
+      .select()
       .from(longFormTable)
-      .leftJoin(finnauxData, eq(finnauxData.id, '62dcd4ea-1c98-40d7-a228-aba4c5c051a5'))
       .where(
         and(
-          // lte(longFormTable.createdAt, new Date(query.to).toISOString()),
-          // gte(longFormTable.createdAt, new Date(query.from).toISOString()),
-          eq(longFormTable.id, '62dcd4ea-1c98-40d7-a228-aba4c5c051a5')
+          lte(longFormTable.createdAt, new Date(query.to).toISOString()),
+          gte(longFormTable.createdAt, new Date(query.from).toISOString()),
         )
       )
-    // .leftJoin(longFormTable, eq(finnauxData.id, '62dcd4ea-1c98-40d7-a228-aba4c5c051a5'))
 
     const updatedData = await Promise.all(data.map(
       async (data) => {
@@ -82,9 +66,9 @@ app.put(
     const { id, ...payload }: putLongFormDataType = c.req.valid("json")
 
     const updatedData = await db
-      .update(finnauxData)
+      .update(longFormTable)
       .set(payload)
-      .where(eq(finnauxData.id, id))
+      .where(eq(longFormTable.id, id))
       .returning()
 
     return c.json({ msg: "Data updated", updatedData }, HttpStatus.OK)

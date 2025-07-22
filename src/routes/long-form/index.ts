@@ -6,8 +6,13 @@ import { env } from "@/env"
 import { deleteCookie, getCookie, setCookie } from "hono/cookie"
 import HttpStatus from "http-status"
 import { yupValidator } from "@/lib/yup/validator"
-import { createCookieSchema, createCookieType } from "./schema"
+import { createCookieSchema, createCookieSchemaType, fileTypeParamSchema, fileUploadSchema } from "./schema"
 import { saveStep1Data, updateStep1Data } from "./services"
+import { storeFile2 } from "@/utils"
+import { db } from "@/db"
+import { longFormTable } from "@/db/schemas/long-form"
+import { eq } from "drizzle-orm"
+import ApiError from "@/lib/error-handler"
 
 const app = new Hono()
 
@@ -21,7 +26,7 @@ app.put(
   yupValidator("json", createCookieSchema),
   async (c) => {
     const existingSession = getCookie(c, env.COOKIE_NAME);
-    const data: createCookieType = c.req.valid("json");
+    const data: createCookieSchemaType = c.req.valid("json");
 
     let existingUserId = null;
     if (existingSession) {
@@ -75,5 +80,36 @@ app.get(
   }
 )
 
+app.post(
+  "/upload/:fileType",
+  jwt({
+    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+    cookie: env.COOKIE_NAME,
+  }),
+  yupValidator("param", fileTypeParamSchema),
+  yupValidator("form", fileUploadSchema),
+  async (c) => {
+    const file = c.req.valid("form").file as File;
+    const { fileType } = c.req.valid("param")
+    const id = c.get("jwtPayload").id
+
+    try {
+      const { filePath } = await storeFile2(file, id, fileType)
+
+      await db
+        .update(longFormTable)
+        .set({
+          [fileType]: filePath
+        })
+        .where(eq(longFormTable.id, id))
+    }
+    catch (e) {
+      console.log(e)
+      throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Something went wrong')
+    }
+
+    return c.json({ message: "File saved successfully" }, HttpStatus.OK)
+  }
+)
 
 export { app as longForm }

@@ -30,6 +30,28 @@ export function generateVerificationToken() {
   return randomBytes(32).toString('hex')
 }
 
+export async function storeFile2(file: File, id: string, fileType: string) {
+  try {
+    const newFileName = id + '-' + fileType + '-' + file.name
+    const filePath = `./src/uploads/${newFileName}`
+    const dir = dirname(filePath)
+
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true })
+    }
+
+    const arrayBuffer = await file.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer);
+
+    await writeFile(filePath, buffer)
+
+    return { message: `${newFileName} saved successfully`, filePath }
+  } catch (error: any) {
+    console.error(`Error saving file:`, error)
+    throw new ApiError(500, error.message ? `Failed to save file: ${error.message}` : 'Unknown Error')
+  }
+}
+
 export async function storeFile(file: [string, string], id: string) {
   const [base64, fileName] = file
   const newFileName = id + '-' + fileName

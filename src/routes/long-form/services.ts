@@ -5,7 +5,7 @@ import { generateOtp, transporter } from "@/utils"
 import { saveToken, sendEmailOtp, sendMobileOtp, verifyToken } from "@/verification-service"
 import { eq } from "drizzle-orm"
 import HttpStatus from "http-status"
-import { createCookieType } from "./schema"
+import { createCookieSchemaType } from "./schema"
 import { env } from "@/env"
 import { renderConfirmationEmail, renderOtpEmail } from "@/verification-service/email-template"
 
@@ -118,13 +118,13 @@ export async function saveEmailService({ id, email, isPersonal }: SaveEmailServi
   }
 }
 
-export async function saveStep1Data(data: createCookieType): Promise<{ id: string }> {
+export async function saveStep1Data(data: createCookieSchemaType): Promise<{ id: string }> {
   const rows = await db.insert(longFormTable).values(data).returning({ id: longFormTable.id })
 
   return { id: rows[0].id }
 }
 
-export async function updateStep1Data(id: string, data: createCookieType) {
+export async function updateStep1Data(id: string, data: createCookieSchemaType) {
   const rows = await db
     .update(longFormTable)
     .set(data)

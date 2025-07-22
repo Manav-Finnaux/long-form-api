@@ -97,4 +97,15 @@ export const createCookieSchema = yup.object({
   gender: yup.string().oneOf(GENDER_VALUES).required(),
   mobileNo: yup.string().matches(Regex.PHONE_NUMBER, "Invalid Phone Number").required(),
 })
-export type createCookieType = yup.InferType<typeof createCookieSchema>
+export type createCookieSchemaType = yup.InferType<typeof createCookieSchema>
+
+export const fileUploadSchema = yup.object({
+  file: yup.mixed().nonNullable().required()
+})
+// .stripUnknown()
+export type fileUploadSchemaType = yup.InferType<typeof fileUploadSchema>
+
+export const fileTypeParamSchema = yup.object({
+  fileType: yup.string().oneOf(['aadhaarFront', 'profilePicture', 'aadhaarBack', 'panCard', 'salarySlips', 'employmentProofDocument', 'bankStatement']).required()
+})
+export type fileTypeParamSchemaType = yup.InferType<typeof fileTypeParamSchema>
