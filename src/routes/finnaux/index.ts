@@ -54,24 +54,24 @@ app.get(
       )
     // .leftJoin(longFormTable, eq(finnauxData.id, '62dcd4ea-1c98-40d7-a228-aba4c5c051a5'))
 
-    // const updatedData = await Promise.all(data.map(
-    //   async (data) => {
-    //     const updatedData: UpdatedLongFormType = {
-    //       ...data,
-    //       profilePicture: await filePathToBase64(data.profilePicture),
-    //       aadhaarFront: await filePathToBase64(data.aadhaarFront),
-    //       aadhaarBack: await filePathToBase64(data.aadhaarBack),
-    //       panCard: await filePathToBase64(data.panCard),
-    //       salarySlips: await filePathArrayToBase64(data.salarySlips),
-    //       employmentProofDocument: await filePathToBase64(data.employmentProofDocument),
-    //       bankStatement: await filePathToBase64(data.bankStatement),
-    //     }
+    const updatedData = await Promise.all(data.map(
+      async (data) => {
+        const updatedData: UpdatedLongFormType = {
+          ...data,
+          profilePicture: await filePathToBase64(data.profilePicture),
+          aadhaarFront: await filePathToBase64(data.aadhaarFront),
+          aadhaarBack: await filePathToBase64(data.aadhaarBack),
+          panCard: await filePathToBase64(data.panCard),
+          salarySlips: await filePathArrayToBase64(data.salarySlips),
+          employmentProofDocument: await filePathToBase64(data.employmentProofDocument),
+          bankStatement: await filePathToBase64(data.bankStatement),
+        }
 
-    //     return updatedData
-    //   }
-    // ))
+        return updatedData
+      }
+    ))
 
-    return c.json({ data }, HttpStatus.OK)
+    return c.json({ data: updatedData }, HttpStatus.OK)
   }
 )
 
