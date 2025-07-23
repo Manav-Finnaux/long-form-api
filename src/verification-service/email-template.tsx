@@ -8,6 +8,13 @@ type ConfirmationEmailType = {
   name: string
 }
 
+const SOCIAL_MEDIA_LINKS = {
+  faceBook: "https://www.facebook.com/people/Northwestern-Finance/61572646620869/",
+  x: "https://x.com/",
+  linkedIn: "https://in.linkedin.com/company/northwesternfinance",
+  instagram: "https://www.instagram.com/northwesternfinance",
+}
+
 function Footer() {
   const footerText = { fontSize: "12px", lineHeight: "18px", color: "#6b7280", marginBottom: "12px" };
   const footerLink = { color: "#374151", fontSize: "14px", textDecoration: "none", display: "block", marginBottom: "6px", width: "fit-content" };
@@ -22,7 +29,7 @@ function Footer() {
             src={`${env.SERVER_URL}/public/fb.png`}
             alt="Facebook Logo"
             width={'12'}
-            height={'auto'}
+            height={'12'}
             style={iconStyle}
           />
         </Link>
@@ -31,7 +38,7 @@ function Footer() {
             src={`${env.SERVER_URL}/public/x.png`}
             alt="X (Twitter) Logo"
             width={'12'}
-            height={'auto'}
+            height={'12'}
             style={iconStyle}
           />
         </Link>
@@ -40,16 +47,16 @@ function Footer() {
             src={`${env.SERVER_URL}/public/linkedin.png`}
             alt="LinkedIn Logo"
             width={'12'}
-            height={'auto'}
+            height={'12'}
             style={iconStyle}
           />
         </Link>
         <Link href={SOCIAL_MEDIA_LINKS.instagram} style={{ display: "inline-block" }} aria-label="Instagram">
           <Img
-            src={`${env.SERVER_URL}/public/insta.png`}
+            src={`${env.SERVER_URL}/public/insta.jpg`}
             alt="Instagram Logo"
             width={'12'}
-            height={'auto'}
+            height={'12'}
             style={iconStyle}
           />
         </Link>
@@ -75,13 +82,6 @@ function Footer() {
       </Text>
     </Section>
   )
-}
-
-const SOCIAL_MEDIA_LINKS = {
-  faceBook: "https://www.facebook.com/people/Northwestern-Finance/61572646620869/",
-  x: "https://x.com/",
-  linkedIn: "https://in.linkedin.com/company/northwesternfinance",
-  instagram: "https://www.instagram.com/northwesternfinance",
 }
 
 export default function OtpEmail({ name, otp }: OtpEmailType) {
