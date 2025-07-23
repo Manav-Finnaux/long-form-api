@@ -1,18 +1,18 @@
-import { Hono } from "hono"
-import { steps } from "./steps"
-import { verification } from "./verification"
-import { jwt, sign, verify } from "hono/jwt"
-import { env } from "@/env"
-import { deleteCookie, getCookie, setCookie } from "hono/cookie"
-import HttpStatus from "http-status"
-import { yupValidator } from "@/lib/yup/validator"
-import { createCookieSchema, createCookieSchemaType, fileTypeParamSchema, fileUploadSchema } from "./schema"
-import { saveStep1Data, updateStep1Data } from "./services"
-import { storeFile2 } from "@/utils"
 import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
-import { eq } from "drizzle-orm"
+import { env } from "@/env"
 import ApiError from "@/lib/error-handler"
+import { yupValidator } from "@/lib/yup/validator"
+import { storeFile2 } from "@/utils"
+import { eq } from "drizzle-orm"
+import { Hono } from "hono"
+import { getCookie, setCookie } from "hono/cookie"
+import { jwt, sign, verify } from "hono/jwt"
+import HttpStatus from "http-status"
+import { createCookieSchema, createCookieSchemaType, fileTypeParamSchema, fileUploadSchema } from "./schema"
+import { saveStep1Data, updateStep1Data } from "./services"
+import { steps } from "./steps"
+import { verification } from "./verification"
 
 const app = new Hono()
 
@@ -22,7 +22,7 @@ app.route('verification', verification)
 // save or update phone number and also manage cookie creation
 // this should be the first request coming from UI
 app.put(
-  "/create-cookie",
+  "/initiate",
   yupValidator("json", createCookieSchema),
   async (c) => {
     const existingSession = getCookie(c, env.COOKIE_NAME);
@@ -60,23 +60,6 @@ app.put(
     }
 
     return c.json(result, HttpStatus.OK);
-  }
-)
-
-app.get(
-  "/delete-cookie",
-  jwt({
-    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
-    cookie: env.COOKIE_NAME,
-  }),
-  async (c) => {
-    deleteCookie(c, env.COOKIE_NAME, {
-      secure: true,
-      httpOnly: true,
-      sameSite: "none",
-    });
-
-    return c.json({ message: 'Ok' }, HttpStatus.OK)
   }
 )
 

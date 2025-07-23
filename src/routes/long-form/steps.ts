@@ -9,6 +9,7 @@ import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
 import { step1Schema, step2Schema, step2Type, step3Schema, step3Type, step4Schema, step4Type, step5Schema, step5Type, step6Schema, step6Type } from "./schema"
 import { sendConfirmationEmail } from "./services"
+import { deleteCookie } from "hono/cookie"
 
 const app = new Hono()
 
@@ -119,25 +120,6 @@ app.post(
   }
 )
 
-// app.post(
-//   "/4b",
-//   jwt({
-//     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
-//     cookie: env.COOKIE_NAME
-//   }),
-//   yupValidator("json", employmentProofSchema),
-//   async (c) => {
-//     const data: employmentProofType = c.req.valid("json");
-//     const id = c.get("jwtPayload").id
-
-//     const { filePath: documentPath } = await storeFile(data.employmentProofDocument, id)
-
-//     await db.update(longFormTable).set({ employmentProofDocument: documentPath }).where(eq(longFormTable.id, id))
-
-//     return c.json({ message: "Data saved successfully" }, HttpStatus.OK)
-//   }
-// )
-
 app.post(
   "/5",
   jwt({
@@ -177,6 +159,12 @@ app.post(
       .where(eq(longFormTable.id, id))
 
     await sendConfirmationEmail(id)
+
+    deleteCookie(c, env.COOKIE_NAME, {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    });
 
     return c.json({ message: 'Data saved successfully' }, HttpStatus.OK)
   }

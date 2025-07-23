@@ -2,8 +2,8 @@ import "dotenv/config";
 
 import ApiError from "@/lib/error-handler";
 import { serve } from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
 import { getConnInfo } from "@hono/node-server/conninfo";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { cors } from "hono/cors";
@@ -11,10 +11,11 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import httpStatus from "http-status";
 import { env } from "./env";
+import { finnaux } from "./routes/finnaux";
 import { location } from "./routes/location";
 import { longForm } from "./routes/long-form";
-import { finnaux } from "./routes/finnaux";
-import { sendEmailOtp } from "./verification-service";
+import { transporter } from "./utils";
+import { renderConfirmationEmail } from "./verification-service/email-template";
 
 const app = new Hono();
 const PORT = env.PORT;
@@ -50,7 +51,14 @@ app.get("/", (c) => {
 });
 
 app.get("/test-email", async (c) => {
-  await sendEmailOtp("manavsharmaskr02@gmail.com", "Manav", '123345')
+  const confirmationEmailTemplateHtml = await renderConfirmationEmail("Manav")
+
+  await transporter.sendMail({
+    from: `Northwestern Finance <${env.EMAIL_ID}>`,
+    to: "manavsharmaskr02@gmail.com",
+    subject: 'Review in progress',
+    html: confirmationEmailTemplateHtml
+  })
 
   return c.json({ msg: "OK" }, 200)
 })
