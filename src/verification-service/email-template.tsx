@@ -20,11 +20,12 @@ function Footer() {
   const footerLink = { color: "#374151", fontSize: "14px", textDecoration: "none", display: "block", marginBottom: "6px", width: "fit-content" };
   const footerContainer = { marginTop: "40px", paddingTop: "30px", borderTop: "1px solid #e5e7eb" as const };
   const iconStyle = { width: "20px", height: "20px", margin: "0 8px" };
+  const socialLink = { display: "inline-block", fontSize: '8' }
 
   return (
     <Section style={footerContainer}>
       <Section style={{ textAlign: "center", marginBottom: "4px" }}>
-        <Link href={SOCIAL_MEDIA_LINKS.faceBook} style={{ display: "inline-block" }} aria-label="Facebook">
+        <Link href={SOCIAL_MEDIA_LINKS.faceBook} style={socialLink} aria-label="Facebook">
           <Img
             src={`${env.SERVER_URL}/public/fb.png`}
             alt="Facebook Logo"
@@ -33,7 +34,7 @@ function Footer() {
             style={iconStyle}
           />
         </Link>
-        <Link href={SOCIAL_MEDIA_LINKS.x} style={{ display: "inline-block" }} aria-label="Twitter">
+        <Link href={SOCIAL_MEDIA_LINKS.x} style={socialLink} aria-label="Twitter">
           <Img
             src={`${env.SERVER_URL}/public/x.png`}
             alt="X (Twitter) Logo"
@@ -42,7 +43,7 @@ function Footer() {
             style={iconStyle}
           />
         </Link>
-        <Link href={SOCIAL_MEDIA_LINKS.linkedIn} style={{ display: "inline-block" }} aria-label="LinkedIn">
+        <Link href={SOCIAL_MEDIA_LINKS.linkedIn} style={socialLink} aria-label="LinkedIn">
           <Img
             src={`${env.SERVER_URL}/public/linkedin.png`}
             alt="LinkedIn Logo"
@@ -51,7 +52,7 @@ function Footer() {
             style={iconStyle}
           />
         </Link>
-        <Link href={SOCIAL_MEDIA_LINKS.instagram} style={{ display: "inline-block" }} aria-label="Instagram">
+        <Link href={SOCIAL_MEDIA_LINKS.instagram} style={socialLink} aria-label="Instagram">
           <Img
             src={`${env.SERVER_URL}/public/insta.jpg`}
             alt="Instagram Logo"
