@@ -60,7 +60,7 @@ export async function sendMobileOtp(mobileNo: string, otp: string) {
 export async function sendEmailOtp(receiverEmailID: string, name: string, otp: string) {
   try {
     const emailHtml = await renderOtpEmail({ otp, name });
-    const subject = `Your OTP code`;
+    const subject = `Verify your email`;
 
     await transporter.sendMail({
       from: `Northwestern Finance <${env.EMAIL_ID}>`,

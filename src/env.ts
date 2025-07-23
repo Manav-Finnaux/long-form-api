@@ -12,7 +12,7 @@ const envSchema = yup.object({
     // FINNAUX_APPLICATION_CLOSURE_URL: yup.string().trim().required().url(),
     COOKIE_NAME: yup.string().trim().required(),
     SERVER_URL: yup.string().required(),
-    UI_URL: yup.string().required(),
+    // UI_URL: yup.string().required(),
 
     EMAIL_ID: yup.string().email().required(),
     EMAIL_REGION: yup.string().required(),

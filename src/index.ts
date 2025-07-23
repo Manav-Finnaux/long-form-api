@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import ApiError from "@/lib/error-handler";
 import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { getConnInfo } from "@hono/node-server/conninfo";
 import { Hono } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
@@ -13,6 +14,7 @@ import { env } from "./env";
 import { location } from "./routes/location";
 import { longForm } from "./routes/long-form";
 import { finnaux } from "./routes/finnaux";
+import { sendEmailOtp } from "./verification-service";
 
 const app = new Hono();
 const PORT = env.PORT;
@@ -41,9 +43,17 @@ app.use(
   })
 );
 
+app.use('/public/*', serveStatic({ root: './' }))
+
 app.get("/", (c) => {
   return c.json({ message: "Hello from server!", data: null });
 });
+
+app.get("/test-email", async (c) => {
+  await sendEmailOtp("manavsharmaskr02@gmail.com", "Manav", '123345')
+
+  return c.json({ msg: "OK" }, 200)
+})
 
 app
   .basePath("/api")
