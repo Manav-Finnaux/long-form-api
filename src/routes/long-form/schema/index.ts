@@ -25,13 +25,13 @@ export type step2Type = yup.InferType<typeof step2Schema>
 export const step3Schema = yup.object({
   aadhaarNo: yup.string().required().trim().matches(Regex.AADHAAR, "Invalid Aadhar"),
   panNo: yup.string().required().trim().matches(Regex.PAN, "Invalid PAN"),
-  profilePicture: yup.mixed(),
-  aadhaarFront: yup.mixed(),
-  aadhaarBack: yup.mixed(),
-  panCard: yup.mixed(),
+  // profilePicture: yup.mixed(),
+  // aadhaarFront: yup.mixed(),
+  // aadhaarBack: yup.mixed(),
+  // panCard: yup.mixed(),
   termsAccepted: yup.boolean().required(),
 })
-// .stripUnknown()
+  .stripUnknown()
 export type step3Type = yup.InferType<typeof step3Schema>
 
 export const step4Schema = yup.object({
@@ -41,19 +41,19 @@ export const step4Schema = yup.object({
   monthlyIncome: yup.number().required().min(0),
   workingYears: yup.number().min(0.5).required(),
   // this can be improved
-  salarySlips: yup
-    .array()
-    .min(1)
-    .max(3)
-    .required(),
+  // salarySlips: yup
+  //   .array()
+  //   .min(1)
+  //   .max(3)
+  //   .required(),
   // employmentProofDocument: yup.mixed()
 }).stripUnknown()
 export type step4Type = yup.InferType<typeof step4Schema>
 
-export const employmentProofSchema = yup.object({
-  employmentProofDocument: yup.mixed()
-}).stripUnknown()
-export type employmentProofType = yup.InferType<typeof employmentProofSchema>
+// export const employmentProofSchema = yup.object({
+//   employmentProofDocument: yup.mixed()
+// }).stripUnknown()
+// export type employmentProofType = yup.InferType<typeof employmentProofSchema>
 
 
 export const step5Schema = yup.object({
@@ -62,11 +62,11 @@ export const step5Schema = yup.object({
   bankAccountNo: yup.string().required(),
   ifscCode: yup.string().required(),
   bankName: yup.string().required(),
-  bankStatement: yup
-    .array()
-    .of(yup.string())
-    .length(2)
-    .required()
+  // bankStatement: yup
+  //   .array()
+  //   .of(yup.string())
+  //   .length(2)
+  //   .required()
 }).stripUnknown()
 export type step5Type = yup.InferType<typeof step5Schema>
 

@@ -5,7 +5,6 @@ import { filePathArrayToBase64, filePathToBase64 } from "@/utils";
 import { and, eq, gte, lte } from "drizzle-orm";
 import { Hono } from "hono";
 import HttpStatus from "http-status";
-import { sendConfirmationEmail } from "../long-form/services";
 import { getLongFormData, getLongFormDataType, putLongFormData, putLongFormDataType } from "./schema";
 
 type DocumentType = string[] | null

@@ -52,6 +52,19 @@ export async function storeFile2(file: File, id: string, fileType: string) {
   }
 }
 
+/**
+ * @deprecated Use `storeFile2` instead.
+ *
+ * This function is deprecated and will be removed in future versions.
+ * Please use {@link storeFile2} for equivalent functionality.
+ *
+ * @example
+ * // Instead of this:
+ * storeFile(file, id);
+ *
+ * // Use this:
+ * storeFile2(file, id, fileType);
+ */
 export async function storeFile(file: [string, string], id: string) {
   const [base64, fileName] = file
   const newFileName = id + '-' + fileName
