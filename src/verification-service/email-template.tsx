@@ -19,12 +19,12 @@ function Footer() {
   const footerText = { fontSize: "12px", lineHeight: "18px", color: "#6b7280", marginBottom: "12px" };
   const footerLink = { color: "#374151", fontSize: "14px", textDecoration: "none", display: "block", marginBottom: "6px", width: "fit-content" };
   const footerContainer = { marginTop: "40px", paddingTop: "30px", borderTop: "1px solid #e5e7eb" as const };
-  const iconStyle = { width: "20px", height: "20px", margin: "0 8px" };
-  const socialLink = { display: "inline-block", fontSize: '8' }
+  const iconStyle = { width: "20px", height: "20px", margin: "0 8px", fontSize: '8' as const };
+  const socialLink = { display: "inline-block", fontSize: '8' as const }
 
   return (
     <Section style={footerContainer}>
-      <Section style={{ textAlign: "center", marginBottom: "4px" }}>
+      <Section style={{ marginBottom: "16px" }}>
         <Link href={SOCIAL_MEDIA_LINKS.faceBook} style={socialLink} aria-label="Facebook">
           <Img
             src={`${env.SERVER_URL}/public/fb.png`}
@@ -130,7 +130,9 @@ export default function OtpEmail({ name, otp }: OtpEmailType) {
           <Text style={textOtp}>Sincerely,</Text>
           <Text style={textOtp}><strong>Northwestern Finance</strong></Text>
 
-          <Section style={footerContainer}>
+          <Footer />
+
+          {/* <Section style={footerContainer}>
             <a href="https://www.nwfinance.in/" style={footerLink}>Home</a>
             <a href="https://www.nwfinance.in/contact" style={footerLink}>Contact Us</a>
             <a href="https://www.nwfinance.in/privacypolicy" style={footerLink}>Privacy Policy</a>
@@ -150,7 +152,7 @@ export default function OtpEmail({ name, otp }: OtpEmailType) {
             <Text style={footerText}>
               Northwestern Finance, NW Finance, and the Northwestern Finance brand mark are trademarks of Shahji Fintech Private Ltd.
             </Text>
-          </Section>
+          </Section> */}
         </Container>
       </Body>
     </Html>
