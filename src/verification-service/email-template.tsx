@@ -100,7 +100,7 @@ export default function OtpEmail({ name, otp }: OtpEmailType) {
   return (
     <Html>
       <Head />
-      <Preview>Email Verification - Your OTP Code</Preview>
+      {/* <Preview>Email Verification - Your OTP Code</Preview> */}
       <Body style={mainOtp}>
         <Container style={containerOtp}>
           <Section style={{ textAlign: "center", marginBottom: "30px" }}>
