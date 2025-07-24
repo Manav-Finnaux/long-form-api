@@ -32,6 +32,7 @@ function Footer() {
             width={'12'}
             height={'12'}
             style={iconStyle}
+            fetchPriority="high"
           />
         </Link>
         <Link href={SOCIAL_MEDIA_LINKS.x} style={socialLink} aria-label="Twitter">
@@ -41,6 +42,7 @@ function Footer() {
             width={'12'}
             height={'12'}
             style={iconStyle}
+            fetchPriority="high"
           />
         </Link>
         <Link href={SOCIAL_MEDIA_LINKS.linkedIn} style={socialLink} aria-label="LinkedIn">
@@ -49,6 +51,7 @@ function Footer() {
             alt="LinkedIn Logo"
             width={'12'}
             height={'12'}
+            fetchPriority="high"
             style={iconStyle}
           />
         </Link>
@@ -58,6 +61,7 @@ function Footer() {
             alt="Instagram Logo"
             width={'12'}
             height={'12'}
+            fetchPriority="high"
             style={iconStyle}
           />
         </Link>
@@ -92,9 +96,6 @@ export default function OtpEmail({ name, otp }: OtpEmailType) {
   const textOtp = { fontSize: "16px", lineHeight: "24px", marginBottom: "20px" };
   const otpBoxOtp = { backgroundColor: "#eef2ff", padding: "12px", borderRadius: "6px", textAlign: "center" as const };
   const otpTextOtp = { fontSize: "24px", fontWeight: "bold", letterSpacing: "4px" };
-  const footerText = { fontSize: "12px", lineHeight: "18px", color: "#6b7280", marginBottom: "12px" };
-  const footerLink = { color: "#374151", fontSize: "14px", textDecoration: "none", display: "block", marginBottom: "6px", width: 'fit-content' };
-  const footerContainer = { marginTop: "40px", paddingTop: "30px", borderTop: "1px solid #e5e7eb" as const };
 
   return (
     <Html>
@@ -108,6 +109,7 @@ export default function OtpEmail({ name, otp }: OtpEmailType) {
               alt="Northwestern Finance Logo"
               width="120"
               height="auto"
+              fetchPriority="high"
               style={{ margin: "0 auto" }}
             />
           </Section>
@@ -179,6 +181,7 @@ function ConfirmationEmail({ name }: ConfirmationEmailType) {
               src={`${env.SERVER_URL}/public/company_logo.jpg`}
               alt="Northwestern Finance Logo"
               width="120"
+              fetchPriority="high"
               height="auto"
             />
           </Section>
