@@ -13,6 +13,7 @@ import { env } from "./env";
 import { finnaux } from "./routes/finnaux";
 import { location } from "./routes/location";
 import { longForm } from "./routes/long-form";
+import { job } from "./utils/cron-job";
 
 const app = new Hono();
 const PORT = env.PORT;
@@ -73,6 +74,8 @@ app.notFound((c) => {
 });
 
 console.log(`Server is running on http://localhost:${PORT}`);
+
+job
 
 serve({
   fetch: app.fetch,

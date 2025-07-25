@@ -9,6 +9,7 @@ import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 import nodemailer from 'nodemailer';
 import { env } from "@/env"
 import fs from "fs/promises"
+import { LongFormTableType } from "@/db/schemas/long-form"
 
 export function generateOtp() {
   return otpGenerator.generate(6, {
@@ -130,4 +131,24 @@ export async function filePathArrayToBase64(src: string[] | null) {
   ))
 
   return returnValue
+}
+
+export function isFullyFilled(row: LongFormTableType) {
+  if (!row.isOfficeEmailVerified && !row.employmentProofDocument) return false;
+
+  const nullValueObject: Partial<Record<keyof LongFormTableType, string | number | boolean | string[] | null>> = {}
+
+  Object.entries(row).forEach((cell) => {
+    const key = cell[0] as keyof LongFormTableType
+    const value = cell[1] as string | number | boolean | string[] | null
+
+    nullValueObject[key] = value;
+  });
+
+  const nullAbleValues: Partial<keyof LongFormTableType>[] = ["address2", "loanPurpose", "isFullyFilled", "status", "applicationNumber", "loanAccountNumber", "reason", "employeeName"];
+
+  return Object.keys(nullValueObject).map((key) => {
+    return !nullAbleValues.includes(key as keyof LongFormTableType)
+  })
+    .every((value) => value)
 }

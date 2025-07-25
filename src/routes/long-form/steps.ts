@@ -10,6 +10,7 @@ import HttpStatus from "http-status"
 import { step1Schema, step2Schema, step2Type, step3Schema, step3Type, step4Schema, step4Type, step5Schema, step5Type, step6Schema, step6Type } from "./schema"
 import { sendConfirmationEmail } from "./services"
 import { deleteCookie } from "hono/cookie"
+import { isFullyFilled } from "@/utils"
 
 const app = new Hono()
 
@@ -153,10 +154,17 @@ app.post(
     const data: step6Type = c.req.valid('json')
     const id: string = c.get('jwtPayload').id
 
-    await db
-      .update(longFormTable)
-      .set(data)
-      .where(eq(longFormTable.id, id))
+    await db.transaction(async (tx) => {
+      const [row] = await tx
+        .update(longFormTable)
+        .set(data)
+        .where(eq(longFormTable.id, id))
+        .returning()
+
+      if (isFullyFilled(row)) {
+        tx.update(longFormTable).set({ isFullyFilled: true }).where(eq(longFormTable.id, id))
+      }
+    })
 
     await sendConfirmationEmail(id)
 
