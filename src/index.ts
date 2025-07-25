@@ -1,9 +1,8 @@
-import "dotenv/config";
-
 import ApiError from "@/lib/error-handler";
 import { serve } from "@hono/node-server";
 import { getConnInfo } from "@hono/node-server/conninfo";
 import { serveStatic } from "@hono/node-server/serve-static";
+import "dotenv/config";
 import { Hono } from "hono";
 import { rateLimiter } from "hono-rate-limiter";
 import { cors } from "hono/cors";
@@ -14,8 +13,6 @@ import { env } from "./env";
 import { finnaux } from "./routes/finnaux";
 import { location } from "./routes/location";
 import { longForm } from "./routes/long-form";
-import { transporter } from "./utils";
-import { renderConfirmationEmail } from "./verification-service/email-template";
 
 const app = new Hono();
 const PORT = env.PORT;
@@ -48,19 +45,6 @@ app.use('/public/*', serveStatic({ root: './' }))
 
 app.get("/", (c) => {
   return c.json({ message: "Hello from server!", data: null });
-});
-
-app.get("/test-email", async (c) => {
-  const confirmationEmailTemplateHtml = await renderConfirmationEmail("Manav")
-
-  await transporter.sendMail({
-    from: `Northwestern Finance <${env.EMAIL_ID}>`,
-    to: "manavsharmaskr02@gmail.com",
-    subject: 'Review in progress',
-    html: confirmationEmailTemplateHtml
-  })
-
-  return c.json({ msg: "OK" }, 200)
 })
 
 app

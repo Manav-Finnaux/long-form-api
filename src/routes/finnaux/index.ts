@@ -34,6 +34,7 @@ app.get(
         and(
           lte(longFormTable.createdAt, new Date(query.to).toISOString()),
           gte(longFormTable.createdAt, new Date(query.from).toISOString()),
+          eq(longFormTable.isFullyFilled, true)
         )
       )
 
