@@ -6,6 +6,7 @@ import { and, eq, gte, lte } from "drizzle-orm";
 import { Hono } from "hono";
 import HttpStatus from "http-status";
 import { getLongFormData, getLongFormDataType, putLongFormData, putLongFormDataType } from "./schema";
+import { verifyAuthorizationHeader } from "@/middlewares";
 
 type DocumentType = string[] | null
 
@@ -20,6 +21,8 @@ interface UpdatedLongFormType extends Omit<LongFormTableType, 'profilePicture' |
 }
 
 const app = new Hono()
+
+app.use(verifyAuthorizationHeader)
 
 app.get(
   "/",
