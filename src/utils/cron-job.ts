@@ -2,7 +2,7 @@ import { db } from '@/db';
 import { longFormTable } from '@/db/schemas/long-form';
 import { tokenTable } from '@/db/schemas/token';
 import { CronJob } from 'cron';
-import { eq, gte } from 'drizzle-orm';
+import { eq, lt } from 'drizzle-orm';
 import { readdir, unlink } from 'fs/promises';
 
 export const job = new CronJob(
@@ -15,7 +15,7 @@ export const job = new CronJob(
 async function purge() {
   console.log("Purging the DB from inferior rows")
   await db.transaction(async (tx) => {
-    await tx.delete(tokenTable).where(gte(tokenTable.tokenExpireAt, new Date().toISOString()))
+    await tx.delete(tokenTable).where(lt(tokenTable.tokenExpireAt, new Date().toISOString()))
     const garbage = await tx.delete(longFormTable).where(eq(longFormTable.isFullyFilled, false)).returning();
     const ids: string[] = garbage.map((row) => row.id);
 

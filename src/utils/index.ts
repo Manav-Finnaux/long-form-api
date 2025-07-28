@@ -121,8 +121,10 @@ export async function filePathToBase64(src: string | null) {
   return await getData(src)
 }
 
-export async function filePathArrayToBase64(src: string[] | null) {
+export async function filePathArrayToBase64(src: string[] | string | null) {
   if (!src || src.length === 0) return null;
+
+  if (!Array.isArray(src)) return await filePathToBase64(src)
 
   const returnValue = await Promise.all(src.map(
     async (src) => {
