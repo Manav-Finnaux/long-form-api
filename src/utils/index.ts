@@ -138,19 +138,63 @@ export async function filePathArrayToBase64(src: string[] | string | null) {
 export function isFullyFilled(row: LongFormTableType) {
   if (!row.isOfficeEmailVerified && !row.employmentProofDocument) return false;
 
-  const nullValueObject: Partial<Record<keyof LongFormTableType, string | number | boolean | string[] | null>> = {}
-
-  Object.entries(row).forEach((cell) => {
-    const key = cell[0] as keyof LongFormTableType
-    const value = cell[1] as string | number | boolean | string[] | null
-
-    nullValueObject[key] = value;
-  });
-
-  const nullAbleValues: Partial<keyof LongFormTableType>[] = ["address2", "loanPurpose", "isFullyFilled", "status", "applicationNumber", "loanAccountNumber", "reason", "employeeName"];
-
-  return Object.keys(nullValueObject).map((key) => {
-    return !nullAbleValues.includes(key as keyof LongFormTableType)
-  })
-    .every((value) => value)
+  return verifiableItemsArray.every((item) => !!row[item])
 }
+// const nullValueObject: Partial<Record<keyof LongFormTableType, string | number | boolean | string[] | null>> = {}
+
+// Object.entries(row).forEach((cell) => {
+//   const key = cell[0] as keyof LongFormTableType
+//   const value = cell[1] as string | number | boolean | string[] | null
+
+//   console.log({ key })
+//   // if (value === null) nullValueObject[key] = value;
+//   if (!value) nullValueObject[key] = value;
+// });
+
+// const nullAbleValues: Partial<keyof LongFormTableType>[] = ["address2", "loanPurpose", "isFullyFilled", "status", "applicationNumber", "loanAccountNumber", "reason", "employeeName"];
+
+// const mapped = Object.keys(nullValueObject).map((key) => {
+//   return !nullAbleValues.includes(key as keyof LongFormTableType)
+// })
+
+// // console.log({ mapped, nullValueObject, nullAbleValues })
+
+// const every = mapped.every((value) => value)
+
+// return every;
+// }
+
+const verifiableItemsArray: Partial<keyof LongFormTableType>[] = [
+  "name",
+  "fatherName",
+  "dob",
+  "gender",
+  "mobileNo",
+  "isMobileOtpVerified",
+  "personalEmail",
+  "isPersonalEmailOtpVerified",
+  "address1",
+  "landmark",
+  "pinCode",
+  "area",
+  "district",
+  "state",
+  "aadhaarNo",
+  "panNo",
+  "profilePicture",
+  "aadhaarFront",
+  "aadhaarBack",
+  "panCard",
+  "termsAccepted",
+  "organizationName",
+  "designation",
+  "monthlyIncome",
+  "workingYears",
+  "salarySlips",
+  "loanAmount",
+  "loanPeriod",
+  "bankAccountNo",
+  "ifscCode",
+  "bankName",
+  "bankStatement"
+]
