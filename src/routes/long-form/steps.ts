@@ -161,8 +161,9 @@ app.post(
         .where(eq(longFormTable.id, id))
         .returning()
 
+      console.log(row)
       if (isFullyFilled(row)) {
-        tx.update(longFormTable).set({ isFullyFilled: true }).where(eq(longFormTable.id, id))
+        await tx.update(longFormTable).set({ isFullyFilled: true }).where(eq(longFormTable.id, id))
       }
     })
 
