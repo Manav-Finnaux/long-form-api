@@ -25,10 +25,6 @@ export type step2Type = yup.InferType<typeof step2Schema>
 export const step3Schema = yup.object({
   aadhaarNo: yup.string().required().trim().matches(Regex.AADHAAR, "Invalid Aadhar"),
   panNo: yup.string().required().trim().matches(Regex.PAN, "Invalid PAN"),
-  // profilePicture: yup.mixed(),
-  // aadhaarFront: yup.mixed(),
-  // aadhaarBack: yup.mixed(),
-  // panCard: yup.mixed(),
   termsAccepted: yup.boolean().required(),
 })
   .stripUnknown()
@@ -39,21 +35,9 @@ export const step4Schema = yup.object({
   organizationName: yup.string().required().trim(),
   designation: yup.string().required().trim(),
   monthlyIncome: yup.number().required().min(0),
-  workingYears: yup.number().min(0.5).required(),
-  // this can be improved
-  // salarySlips: yup
-  //   .array()
-  //   .min(1)
-  //   .max(3)
-  //   .required(),
-  // employmentProofDocument: yup.mixed()
+  workingYears: yup.number().min(0.5).required()
 }).stripUnknown()
 export type step4Type = yup.InferType<typeof step4Schema>
-
-// export const employmentProofSchema = yup.object({
-//   employmentProofDocument: yup.mixed()
-// }).stripUnknown()
-// export type employmentProofType = yup.InferType<typeof employmentProofSchema>
 
 
 export const step5Schema = yup.object({
@@ -62,11 +46,7 @@ export const step5Schema = yup.object({
   bankAccountNo: yup.string().required(),
   ifscCode: yup.string().required(),
   bankName: yup.string().required(),
-  // bankStatement: yup
-  //   .array()
-  //   .of(yup.string())
-  //   .length(2)
-  //   .required()
+  preferredEmiDate: yup.number().oneOf([10, 20]),
 }).stripUnknown()
 export type step5Type = yup.InferType<typeof step5Schema>
 
@@ -102,7 +82,7 @@ export type createCookieSchemaType = yup.InferType<typeof createCookieSchema>
 export const fileUploadSchema = yup.object({
   file: yup.mixed().nonNullable().required()
 })
-// .stripUnknown()
+
 export type fileUploadSchemaType = yup.InferType<typeof fileUploadSchema>
 
 export const fileTypeParamSchema = yup.object({

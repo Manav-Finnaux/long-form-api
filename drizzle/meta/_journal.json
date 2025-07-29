@@ -57,6 +57,13 @@
       "when": 1753428155414,
       "tag": "0007_faulty_pandemic",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1753773381215,
+      "tag": "0008_closed_zuras",
+      "breakpoints": true
     }
   ]
 }

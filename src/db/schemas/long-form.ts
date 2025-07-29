@@ -52,6 +52,7 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     ifscCode: db.text(),
     bankName: db.text(),
     bankStatement: db.text(),
+    preferredEmiDate: db.integer(),
 
     // Step 6: Final Submission
     loanPurpose: db.text(),

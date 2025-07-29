@@ -196,5 +196,6 @@ const verifiableItemsArray: Partial<keyof LongFormTableType>[] = [
   "bankAccountNo",
   "ifscCode",
   "bankName",
-  "bankStatement"
+  "bankStatement",
+  "preferredEmiDate"
 ]

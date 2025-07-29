@@ -75,14 +75,7 @@ app.post(
   yupValidator("json", step3Schema),
   async (c) => {
     const documentsData: step3Type = c.req.valid("json")
-    const id = c.get('jwtPayload').id
-
-    // const { filePath: aadhaarBack } = await storeFile(documentsData.aadhaarBack, id)
-    // const { filePath: aadhaarFront } = await storeFile(documentsData.aadhaarFront, id)
-    // const { filePath: panCard } = await storeFile(documentsData.panCard, id)
-    // const { filePath: profilePicture } = await storeFile(documentsData.profilePicture, id)
-
-    // const updatedData = { ...documentsData, aadhaarBack, aadhaarFront, panCard, profilePicture }
+    const id = c.get('jwtPayload').isFullyFilled
 
     await db
       .update(longFormTable)
@@ -104,14 +97,6 @@ app.post(
     const data: step4Type = c.req.valid("json")
     const id: string = c.get('jwtPayload').id
 
-    // const salarySlipPaths = await Promise.all(
-    //   data.salarySlips.map(async (salarySlip) => {
-    //     const res = await storeFile(salarySlip as [string, string], id) // salarySlip as [base64, fileName]
-
-    //     return res.filePath
-    //   })
-    // )
-
     await db
       .update(longFormTable)
       .set(data)
@@ -131,8 +116,6 @@ app.post(
   async (c) => {
     const data: step5Type = c.req.valid('json')
     const id: string = c.get('jwtPayload').id
-
-    // const { filePath: bankStatement } = await storeFile(data.bankStatement as [string, string], id)
 
     await db
       .update(longFormTable)
@@ -161,7 +144,6 @@ app.post(
         .where(eq(longFormTable.id, id))
         .returning()
 
-      console.log(row)
       if (isFullyFilled(row)) {
         await tx.update(longFormTable).set({ isFullyFilled: true }).where(eq(longFormTable.id, id))
       }
