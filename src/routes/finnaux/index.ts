@@ -68,13 +68,12 @@ app.put(
   async (c) => {
     const { id, ...payload }: putLongFormDataType = c.req.valid("json")
 
-    const updatedData = await db
+    await db
       .update(longFormTable)
       .set(payload)
       .where(eq(longFormTable.id, id))
-      .returning()
 
-    return c.json({ msg: "Data updated", updatedData }, HttpStatus.OK)
+    return c.json({ message: "Data updated" }, HttpStatus.OK)
   }
 )
 export { app as finnaux };
