@@ -5,64 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1752310971465,
-      "tag": "0000_dazzling_vapor",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1752747365924,
-      "tag": "0001_breezy_bulldozer",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1752753847063,
-      "tag": "0002_tired_squirrel_girl",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1753082622032,
-      "tag": "0003_strong_juggernaut",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1753099965940,
-      "tag": "0004_regular_ender_wiggin",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1753179364224,
-      "tag": "0005_breezy_crusher_hogan",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1753189319671,
-      "tag": "0006_tranquil_susan_delgado",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1753428155414,
-      "tag": "0007_faulty_pandemic",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1753773381215,
-      "tag": "0008_closed_zuras",
+      "when": 1753948724502,
+      "tag": "0000_cool_zuras",
       "breakpoints": true
     }
   ]

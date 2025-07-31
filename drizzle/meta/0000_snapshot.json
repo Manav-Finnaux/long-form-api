@@ -1,5 +1,5 @@
 {
-  "id": "2f2fd5d0-d6ef-47bc-99df-f6620cecbca7",
+  "id": "361843f0-fae2-4645-9d09-374e02052bad",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -60,19 +60,6 @@
         },
         "isPersonalEmailOtpVerified": {
           "name": "isPersonalEmailOtpVerified",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "default": false
-        },
-        "officeEmail": {
-          "name": "officeEmail",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "isOfficeEmailVerified": {
-          "name": "isOfficeEmailVerified",
           "type": "boolean",
           "primaryKey": false,
           "notNull": false,
@@ -199,6 +186,25 @@
           "primaryKey": false,
           "notNull": false
         },
+        "officeEmail": {
+          "name": "officeEmail",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isOfficeEmailVerified": {
+          "name": "isOfficeEmailVerified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "employmentProofDocument": {
+          "name": "employmentProofDocument",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "loanAmount": {
           "name": "loanAmount",
           "type": "double precision",
@@ -235,6 +241,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "preferredEmiDate": {
+          "name": "preferredEmiDate",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
         "loanPurpose": {
           "name": "loanPurpose",
           "type": "text",
@@ -251,6 +263,44 @@
         "updatedAt": {
           "name": "updatedAt",
           "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "isFullyFilled": {
+          "name": "isFullyFilled",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "status": {
+          "name": "status",
+          "type": "application_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "applicationNumber": {
+          "name": "applicationNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loanAccountNumber": {
+          "name": "loanAccountNumber",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "employeeName": {
+          "name": "employeeName",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         }
@@ -365,6 +415,55 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.smsConfig": {
+      "name": "smsConfig",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "route": {
+          "name": "route",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "senderId": {
+          "name": "senderId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "template": {
+          "name": "template",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "templateId": {
+          "name": "templateId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.token": {
       "name": "token",
       "schema": "",
@@ -397,13 +496,33 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "token_target_unique": {
+          "name": "token_target_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "target"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
     }
   },
   "enums": {
+    "public.application_status": {
+      "name": "application_status",
+      "schema": "public",
+      "values": [
+        "PENDING",
+        "IN_PROGRESS",
+        "REJECTED",
+        "COMPLETED",
+        "CLOSED",
+        "HOLD"
+      ]
+    },
     "public.gender": {
       "name": "gender",
       "schema": "public",

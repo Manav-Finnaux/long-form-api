@@ -3,7 +3,7 @@ import { longFormTable } from "@/db/schemas/long-form"
 import { env } from "@/env"
 import ApiError from "@/lib/error-handler"
 import { yupValidator } from "@/lib/yup/validator"
-import { storeFile2 } from "@/utils"
+import { fifo, storeFile2 } from "@/utils"
 import { eq } from "drizzle-orm"
 import { Hono } from "hono"
 import { getCookie, setCookie } from "hono/cookie"
@@ -13,6 +13,8 @@ import { createCookieSchema, createCookieSchemaType, fileTypeParamSchema, fileUp
 import { saveStep1Data, updateStep1Data } from "./services"
 import { steps } from "./steps"
 import { verification } from "./verification"
+import yup from "@/lib/yup"
+// import { multipart } from "@hono/mu"
 
 const app = new Hono()
 
@@ -64,6 +66,57 @@ app.put(
 )
 
 app.post(
+  "upload/salarySlips",
+  jwt({
+    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+    cookie: env.COOKIE_NAME
+  }),
+  yupValidator("form", yup.object({
+    'file[]': yup.mixed()
+  })),
+  async (c) => {
+    const body = await c.req.parseBody();
+    const files = body['files[]']
+    const filesArray = Array.isArray(files) ? files : [files];
+    const id = c.get("jwtPayload").id;
+
+    try {
+      let filePaths: string[] = [];
+
+      for (let file of filesArray) {
+        const { filePath } = await storeFile2(file, id, 'salarySlips');
+        filePaths.push(filePath);
+      }
+
+      await db.transaction(async (tx) => {
+        let filePathsArray = [...filePaths];
+
+        const [{ existingSalarySlips }] = await tx
+          .select({ existingSalarySlips: longFormTable.salarySlips })
+          .from(longFormTable)
+          .where(eq(longFormTable.id, id))
+
+        if (Array.isArray(existingSalarySlips)) {
+          filePathsArray = fifo(existingSalarySlips, filePaths)
+        }
+
+        await tx
+          .update(longFormTable)
+          .set({
+            salarySlips: filePathsArray
+          })
+          .where(eq(longFormTable.id, id))
+      })
+    }
+    catch (e) {
+      console.log('salarySlips api error', e)
+    }
+
+    return c.json({ message: "File saved successfully" }, HttpStatus.OK)
+  }
+)
+
+app.post(
   "/upload/:fileType",
   jwt({
     secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
@@ -79,12 +132,16 @@ app.post(
     try {
       const { filePath } = await storeFile2(file, id, fileType)
 
+      // await db.transaction(async (tx) => {
+      let filePathToStore: string[] | string = filePath;
+
       await db
         .update(longFormTable)
         .set({
-          [fileType]: filePath
+          [fileType]: filePathToStore
         })
         .where(eq(longFormTable.id, id))
+      // })
     }
     catch (e) {
       console.log(e)

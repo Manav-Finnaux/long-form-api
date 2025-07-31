@@ -202,3 +202,15 @@ const verifiableItemsArray: Partial<keyof LongFormTableType>[] = [
   "bankStatement",
   "preferredEmiDate"
 ]
+
+export function fifo(array: string[], newValues: string[]) {
+  if (newValues.length === 3) return newValues;
+
+  const set = new Set([...array, ...newValues])
+  const returnArray = [...set]
+  while (returnArray.length > 3) {
+    returnArray.shift();
+  }
+
+  return returnArray;
+}
