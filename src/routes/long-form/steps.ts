@@ -75,7 +75,7 @@ app.post(
   yupValidator("json", step3Schema),
   async (c) => {
     const documentsData: step3Type = c.req.valid("json")
-    const id = c.get('jwtPayload').isFullyFilled
+    const id = c.get('jwtPayload').id
 
     await db
       .update(longFormTable)
