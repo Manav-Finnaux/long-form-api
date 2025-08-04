@@ -5,8 +5,11 @@ import { Hono } from "hono"
 import { rateLimiter } from "hono-rate-limiter"
 import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
-import { getEmailOtpSchema, verifyTokenSchema } from "./schema"
+import { getEmailOtpSchema, verifyDocumentNoSchema, verifyDocumentNoSchemaType, verifyTokenSchema } from "./schema"
 import { saveEmailService, sendEmailOtpService, sendMobileOtpService, verifyEmailOtpService, verifyMobileOtpService } from "./services"
+import { db } from "@/db"
+import { longFormTable } from "@/db/schemas/long-form"
+import { and, eq, ne, or } from "drizzle-orm"
 
 // the cookie was added in create-cookie route
 // all the routes below will have access to the id
@@ -99,6 +102,61 @@ app.put(
     const id = c.get("jwtPayload").id
 
     return c.json(await verifyEmailOtpService({ id, otp, isPersonal }), HttpStatus.OK)
+  }
+)
+
+app.get(
+  "/can-proceed",
+  jwt({
+    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+    cookie: env.COOKIE_NAME
+  }),
+  yupValidator("query", verifyDocumentNoSchema),
+  async (c) => {
+    const { type, value }: verifyDocumentNoSchemaType = c.req.valid("query");
+
+    const canProceed = await db.transaction(async (tx) => {
+      const applications = await tx
+        .select({
+          aadhaarNo: longFormTable.aadhaarNo,
+          panNo: longFormTable.panNo,
+          updatedAt: longFormTable.updatedAt,
+          status: longFormTable.status
+        })
+        .from(longFormTable)
+        .where(and(eq(longFormTable[type], value), eq(longFormTable.isFullyFilled, true)));
+
+      // if there are no applications, then application can proceed as its a new one
+      if (applications.length === 0) return true;
+
+      function hasValidStatus(array: typeof applications) {
+        // original function
+        // const f2 = (arr) => arr.some(({status}) => status === "PENDING" || status === "IN_PROGRESS" || status === "COMPLETED" || status === "HOLD")
+        const invalidValues = new Set(["PENDING", "IN_PROGRESS", "COMPLETED", "HOLD"]);
+        return array.some(({ status }) => invalidValues.has(status!))
+      }
+      if (hasValidStatus(applications)) return false;
+
+      // if status is CLOSED or REJECTED, then, 
+      // for status === CLOSED, reject if application was closed before 7 days from now
+      // for status === REJECTED, reject if application was closed before 30 days from now
+      const closedApplications = applications.filter(({ status }) => status === "CLOSED")
+      const rejectedApplications = applications.filter(({ status }) => status === "REJECTED")
+      const now = new Date();
+      const sevenDaysBeforeNow = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const ninetyDaysBeforeNow = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+
+      // * new Date(updatedAt) > sevenDaysBeforeNow checks whether the update happened after that — i.e., within the last 7 days.
+      const isClosedInvalid = closedApplications.some(({ updatedAt }) => new Date(updatedAt!) > sevenDaysBeforeNow)
+      const isRejectedInvalid = rejectedApplications.some(({ updatedAt }) => new Date(updatedAt!) > ninetyDaysBeforeNow)
+
+      if (isClosedInvalid || isRejectedInvalid) return false;
+
+      // All checks have passed
+      return true;
+    })
+
+    return c.json({ canProceed }, canProceed ? HttpStatus.OK : HttpStatus.CONFLICT)
   }
 )
 
