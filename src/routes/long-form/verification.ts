@@ -1,15 +1,15 @@
+import { db } from "@/db"
+import { longFormTable } from "@/db/schemas/long-form"
 import { env } from "@/env"
 import ApiError from "@/lib/error-handler"
 import { yupValidator } from "@/lib/yup/validator"
+import { and, eq } from "drizzle-orm"
 import { Hono } from "hono"
 import { rateLimiter } from "hono-rate-limiter"
 import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
 import { getEmailOtpSchema, verifyDocumentNoSchema, verifyDocumentNoSchemaType, verifyTokenSchema } from "./schema"
 import { saveEmailService, sendEmailOtpService, sendMobileOtpService, verifyEmailOtpService, verifyMobileOtpService } from "./services"
-import { db } from "@/db"
-import { longFormTable } from "@/db/schemas/long-form"
-import { and, eq, ne, or } from "drizzle-orm"
 
 // the cookie was added in create-cookie route
 // all the routes below will have access to the id

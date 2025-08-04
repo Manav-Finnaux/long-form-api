@@ -21,7 +21,6 @@ export const getLongFormData = yup.object({
 export type getLongFormDataType = yup.InferType<typeof getLongFormData>
 
 export const putLongFormData = yup.object({
-  id: yup.string().uuid().required("ID is required."),
   status: yup.string().oneOf(applicationStatusEnum.enumValues, "Invalid status value").required(),
   applicationNumber: yup.string(),
   loanAccountNumber: yup.string(),

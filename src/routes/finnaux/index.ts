@@ -7,6 +7,7 @@ import { Hono } from "hono";
 import HttpStatus from "http-status";
 import { getLongFormData, getLongFormDataType, putLongFormData, putLongFormDataType } from "./schema";
 import { verifyAuthorizationHeader } from "@/middlewares";
+import yup from "@/lib/yup";
 
 type DocumentType = string[] | null
 
@@ -63,10 +64,15 @@ app.get(
 )
 
 app.put(
-  "/",
+  "/:id",
   yupValidator("json", putLongFormData),
+  yupValidator("param", yup.object({
+    id: yup.string().uuid().required("ID is required."),
+  }
+  )),
   async (c) => {
-    const { id, ...payload }: putLongFormDataType = c.req.valid("json")
+    const payload: putLongFormDataType = c.req.valid("json")
+    const { id } = c.req.valid("param")
 
     await db
       .update(longFormTable)
