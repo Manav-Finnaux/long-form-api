@@ -46,7 +46,7 @@ export const step5Schema = yup.object({
   bankAccountNo: yup.string().required(),
   ifscCode: yup.string().required(),
   bankName: yup.string().required(),
-  preferredEmiDate: yup.number().oneOf([10, 20]),
+  preferredEmiDate: yup.number().oneOf([5, 10, 15, 20, 25]),
 }).stripUnknown()
 export type step5Type = yup.InferType<typeof step5Schema>
 

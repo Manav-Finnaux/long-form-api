@@ -157,7 +157,7 @@ app.post(
       sameSite: "none",
     });
 
-    return c.json({ message: 'Data saved successfully' }, HttpStatus.OK)
+    return c.json({ message: 'Data saved successfully', success: true }, HttpStatus.OK)
   }
 )
 
