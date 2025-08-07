@@ -35,16 +35,6 @@ function Footer() {
             fetchPriority="high"
           />
         </Link>
-        <Link href={SOCIAL_MEDIA_LINKS.x} style={socialLink} aria-label="Twitter">
-          <Img
-            src={`${env.SERVER_URL}/public/x.png`}
-            alt="X (Twitter) Logo"
-            width={'12'}
-            height={'12'}
-            style={iconStyle}
-            fetchPriority="high"
-          />
-        </Link>
         <Link href={SOCIAL_MEDIA_LINKS.linkedIn} style={socialLink} aria-label="LinkedIn">
           <Img
             src={`${env.SERVER_URL}/public/linkedin.png`}
