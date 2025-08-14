@@ -149,6 +149,19 @@ app.post(
       }
     })
 
+    return c.json({ message: 'Data saved successfully' }, HttpStatus.OK)
+  }
+)
+
+app.post(
+  "/7",
+  jwt({
+    secret: env.ANONYMOUS_CUSTOMER_JWT_SECRET,
+    cookie: env.COOKIE_NAME
+  }),
+  async (c) => {
+    const id = c.get("jwtPayload").id
+
     await sendConfirmationEmail(id)
 
     deleteCookie(c, env.COOKIE_NAME, {
