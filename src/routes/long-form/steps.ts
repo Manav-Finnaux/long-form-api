@@ -137,17 +137,11 @@ app.post(
     const data: step6Type = c.req.valid('json')
     const id: string = c.get('jwtPayload').id
 
-    await db.transaction(async (tx) => {
-      const [row] = await tx
-        .update(longFormTable)
-        .set(data)
-        .where(eq(longFormTable.id, id))
-        .returning()
-
-      if (isFullyFilled(row)) {
-        await tx.update(longFormTable).set({ isFullyFilled: true }).where(eq(longFormTable.id, id))
-      }
-    })
+    await db
+      .update(longFormTable)
+      .set(data)
+      .where(eq(longFormTable.id, id))
+      .returning()
 
     return c.json({ message: 'Data saved successfully' }, HttpStatus.OK)
   }
@@ -161,6 +155,14 @@ app.post(
   }),
   async (c) => {
     const id = c.get("jwtPayload").id
+
+    await db.transaction(async (tx) => {
+      const [row] = await tx.select().from(longFormTable).where(eq(longFormTable.id, id))
+
+      if (isFullyFilled(row)) {
+        await tx.update(longFormTable).set({ isFullyFilled: true }).where(eq(longFormTable.id, id))
+      }
+    })
 
     await sendConfirmationEmail(id)
 
