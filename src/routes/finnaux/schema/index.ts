@@ -1,18 +1,6 @@
 import { applicationStatusEnum } from "@/db/schemas/enums";
 import yup from "@/lib/yup";
 
-// export const getDataInDateRange = yup.object({
-//   from: yup
-//     .string()
-//     .required('From timestamp is required')
-//     .datetime({ allowOffset: false, message: 'From must be a valid ISO datetime in UTC (Z)' }),
-
-//   to: yup
-//     .string()
-//     .required('To timestamp is required')
-//     .datetime({ allowOffset: false, message: 'To must be a valid ISO datetime in UTC (Z)' }),
-// });
-
 export const getLongFormData = yup.object({
   from: yup.date().required(),
   to: yup.date().required().min(yup.ref("from"), `The "to" query should be greater than or equal to "from" query`),

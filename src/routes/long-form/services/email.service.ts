@@ -1,45 +1,11 @@
 import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
 import ApiError from "@/lib/error-handler"
-import { generateOtp, transporter } from "@/utils"
-import { saveToken, sendEmailOtp, sendMobileOtp, verifyToken } from "@/verification-service"
+import { renderConfirmationEmail, renderOtpEmail } from "@/lib/email-template"
+import { generateOtp, saveToken, sendMail, verifyToken } from "@/utils"
 import { eq } from "drizzle-orm"
 import HttpStatus from "http-status"
-import { createCookieSchemaType } from "./schema"
-import { env } from "@/env"
-import { renderConfirmationEmail, renderOtpEmail } from "@/verification-service/email-template"
 
-export async function sendMobileOtpService(id: string) {
-  const [row] = await db
-    .select({ mobileNo: longFormTable.mobileNo })
-    .from(longFormTable)
-    .where(eq(longFormTable.id, id))
-
-  if (!row?.mobileNo) {
-    throw new ApiError(404, "User not found")
-  }
-
-  const otp = generateOtp()
-  await sendMobileOtp(row.mobileNo, otp)
-  await saveToken(row.mobileNo, otp, new Date(Date.now() + 5 * 60 * 1000)) // 5 minutes
-
-  return { message: "OTP Sent!", data: null }
-}
-
-export async function verifyMobileOtpService(id: any, data: any) {
-  const [row] = await db
-    .select({ mobileNo: longFormTable.mobileNo })
-    .from(longFormTable)
-    .where(eq(longFormTable.id, id))
-
-  await verifyToken(data.otp as string, row.mobileNo as string)
-  await db
-    .update(longFormTable)
-    .set({ isMobileOtpVerified: true })
-    .where(eq(longFormTable.id, id))
-
-  return { message: "OTP verified", data: { verificationSuccessful: true } }
-}
 
 export async function sendEmailOtpService(id: string, isPersonal: boolean) {
   const [row] = await db
@@ -52,7 +18,10 @@ export async function sendEmailOtpService(id: string, isPersonal: boolean) {
   }
 
   const otp = generateOtp()
-  await sendEmailOtp(row.email, row.name, otp)
+  const html = await renderOtpEmail({ otp, name: row.name })
+  const subject = 'Verify your email'
+  await sendMail(row.email, subject, html)
+
   await saveToken(row.email, otp, new Date(Date.now() + 5 * 60 * 1000)) // 5 minutes
 
   return { message: "OTP Sent!", data: null }
@@ -118,22 +87,6 @@ export async function saveEmailService({ id, email, isPersonal }: SaveEmailServi
   }
 }
 
-export async function saveStep1Data(data: createCookieSchemaType): Promise<{ id: string }> {
-  const rows = await db.insert(longFormTable).values(data).returning({ id: longFormTable.id })
-
-  return { id: rows[0].id }
-}
-
-export async function updateStep1Data(id: string, data: createCookieSchemaType) {
-  const rows = await db
-    .update(longFormTable)
-    .set(data)
-    .where(eq(longFormTable.id, id))
-    .returning({ id: longFormTable.id })
-
-  return { id: rows[0].id }
-}
-
 export async function sendConfirmationEmail(id: string) {
   const [data] = await db
     .select({ personalEmail: longFormTable.personalEmail, name: longFormTable.name })
@@ -146,12 +99,7 @@ export async function sendConfirmationEmail(id: string) {
 
   const confirmationEmailTemplateHtml = await renderConfirmationEmail(data.name)
 
-  await transporter.sendMail({
-    from: `Northwestern Finance <${env.EMAIL_ID}>`,
-    to: data.personalEmail,
-    subject: 'Review in progress',
-    html: confirmationEmailTemplateHtml
-  })
+  await sendMail(data.personalEmail, 'Review in progress', confirmationEmailTemplateHtml)
 
   return { message: "Confirmation Email Sent" }
 }
