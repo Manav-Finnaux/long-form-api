@@ -8,8 +8,8 @@ import { Hono } from "hono"
 import { rateLimiter } from "hono-rate-limiter"
 import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
-import { getEmailOtpSchema, verifyDocumentNoSchema, verifyDocumentNoSchemaType, verifyTokenSchema } from "./schema"
-import { saveEmailService, sendEmailOtpService, sendMobileOtpService, verifyEmailOtpService, verifyMobileOtpService } from "./services"
+import { getEmailOtpSchema, verifyDocumentNoSchema, verifyDocumentNoSchemaType, verifyTokenSchema } from "@/routes/long-form/schema"
+import { saveEmailService, sendEmailOtpService, sendMobileOtpService, verifyEmailOtpService, verifyMobileOtpService } from "@/routes/long-form/services"
 
 // the cookie was added in create-cookie route
 // all the routes below will have access to the id

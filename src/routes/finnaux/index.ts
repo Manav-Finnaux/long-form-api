@@ -6,7 +6,7 @@ import { and, eq, gte, lte } from "drizzle-orm";
 import { Hono } from "hono";
 import HttpStatus from "http-status";
 import { getLongFormData, getLongFormDataType, putLongFormData, putLongFormDataType } from "./schema";
-import { verifyAuthorizationHeader } from "@/middlewares";
+import { verifyAuthorizationHeader } from "@/lib/middleware.lib";
 import yup from "@/lib/yup";
 
 type DocumentType = string[] | null

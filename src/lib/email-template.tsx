@@ -1,6 +1,6 @@
 /** @jsxImportSource react */
 import { env } from "@/env";
-import { Html, Head, Preview, Body, Container, Text, Section, render, Button, Link, Hr, Heading, Img } from "@react-email/components";
+import { Body, Container, Head, Heading, Html, Img, Link, Preview, Section, Text, render } from "@react-email/components";
 
 type OtpEmailType = { name?: string; otp: string }
 
@@ -79,7 +79,7 @@ function Footer() {
   )
 }
 
-export default function OtpEmail({ name, otp }: OtpEmailType) {
+function OtpEmail({ name, otp }: OtpEmailType) {
   const mainOtp = { backgroundColor: "#f6f9fc", fontFamily: "Helvetica, Arial, sans-serif", padding: "20px" };
   const containerOtp = { backgroundColor: "#ffffff", borderRadius: "8px", padding: "30px", maxWidth: "480px", margin: "0 auto" };
   const headingOtp = { fontSize: "20px", fontWeight: "bold", marginBottom: "20px" };
@@ -151,10 +151,6 @@ export default function OtpEmail({ name, otp }: OtpEmailType) {
   );
 }
 
-export async function renderOtpEmail(credentials: OtpEmailType) {
-  return await render(<OtpEmail otp={credentials.otp} name={credentials.name} />)
-}
-
 function ConfirmationEmail({ name }: ConfirmationEmailType) {
   const mainContainer = { backgroundColor: "#f6f9fc", fontFamily: "Helvetica, Arial, sans-serif", padding: "20px" };
   const container = { backgroundColor: "#ffffff", borderRadius: "8px", padding: "30px", maxWidth: "480px", margin: "0 auto" };
@@ -190,4 +186,8 @@ function ConfirmationEmail({ name }: ConfirmationEmailType) {
 
 export async function renderConfirmationEmail(name: string) {
   return await render(<ConfirmationEmail name={name} />)
+}
+
+export async function renderOtpEmail(credentials: OtpEmailType) {
+  return await render(<OtpEmail otp={credentials.otp} name={credentials.name} />)
 }

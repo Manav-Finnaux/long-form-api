@@ -12,8 +12,8 @@ import httpStatus from "http-status";
 import { env } from "./env";
 import { finnaux } from "./routes/finnaux";
 import { location } from "./routes/location";
-import { longForm } from "./routes/long-form";
-import { job } from "./utils/cron-job";
+import { longForm } from "./routes/long-form/handlers";
+import { job } from "./lib/cron-job";
 
 const app = new Hono();
 const PORT = env.PORT;
