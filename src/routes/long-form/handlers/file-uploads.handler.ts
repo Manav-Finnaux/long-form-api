@@ -2,6 +2,7 @@ import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
 import { env } from "@/env"
 import ApiError from "@/lib/error-handler"
+import { Logger } from "@/lib/logger"
 import yup from "@/lib/yup"
 import { yupValidator } from "@/lib/yup/validator"
 import { fileTypeParamSchema, fileUploadSchema } from "@/routes/long-form/schema"
@@ -12,6 +13,7 @@ import { jwt } from "hono/jwt"
 import HttpStatus from "http-status"
 
 const app = new Hono()
+const fileHandlerLogger = new Logger('FileHandler')
 
 app.post(
   "/salarySlips",
@@ -56,8 +58,8 @@ app.post(
           .where(eq(longFormTable.id, id))
       })
     }
-    catch (e) {
-      console.log('salarySlips api error', e)
+    catch (e: any) {
+      fileHandlerLogger.error(`salarySlips api error ${e.message ?? ''}`)
     }
 
     return c.json({ message: "File saved successfully" }, HttpStatus.OK)
@@ -91,8 +93,8 @@ app.post(
         .where(eq(longFormTable.id, id))
       // })
     }
-    catch (e) {
-      console.log(e)
+    catch (e: any) {
+      fileHandlerLogger.error(e.message ?? 'file saving error')
       throw new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, 'Something went wrong')
     }
 

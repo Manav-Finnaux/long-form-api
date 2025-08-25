@@ -26,6 +26,46 @@ const app = new Hono()
 app.use(verifyAuthorizationHeader)
 
 app.get(
+  "/incomplete",
+  async (c) => {
+    const data: LongFormTableType[] = await db
+      .select()
+      .from(longFormTable)
+      .where(
+        eq(longFormTable.isFullyFilled, false)
+      )
+
+    const updatedData = await Promise.all(data.map(
+      async (data) => {
+        const profilePicture = !!data.profilePicture && await filePathArrayToBase64(data.profilePicture);
+        const aadhaarFront = !!data.aadhaarFront && await filePathToBase64(data.aadhaarFront);
+        const aadhaarBack = !!data.aadhaarBack && await filePathToBase64(data.aadhaarBack);
+        const panCard = !!data.panCard && await filePathToBase64(data.panCard);
+        const salarySlips = !!data.salarySlips && await filePathArrayToBase64(data.salarySlips);
+        const employmentProofDocument = !!data.employmentProofDocument && await filePathToBase64(data.employmentProofDocument);
+        const bankStatement = !!data.bankStatement && await filePathToBase64(data.bankStatement);
+
+
+        const updatedData = {
+          ...data,
+          profilePicture,
+          aadhaarFront,
+          aadhaarBack,
+          panCard,
+          salarySlips,
+          employmentProofDocument,
+          bankStatement,
+        };
+
+        return updatedData
+      }
+    ))
+
+    return c.json({ data: updatedData }, HttpStatus.OK)
+  }
+)
+
+app.get(
   "/",
   yupValidator("query", getLongFormData),
   async (c) => {

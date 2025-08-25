@@ -1,5 +1,5 @@
 {
-  "id": "361843f0-fae2-4645-9d09-374e02052bad",
+  "id": "8d77b9b9-3bdc-4e5b-b1ef-6bf4dc7c39cc",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -272,6 +272,19 @@
           "primaryKey": false,
           "notNull": false,
           "default": false
+        },
+        "isContinueApplicationLinkSent": {
+          "name": "isContinueApplicationLinkSent",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "stepsCompleted": {
+          "name": "stepsCompleted",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
         },
         "status": {
           "name": "status",

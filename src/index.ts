@@ -14,9 +14,12 @@ import { finnaux } from "./routes/finnaux";
 import { location } from "./routes/location";
 import { longForm } from "./routes/long-form/handlers";
 import { job } from "./lib/cron-job";
+import { Logger } from "./lib/logger";
+import 'dotenv/config'
 
 const app = new Hono();
 const PORT = env.PORT;
+const globalLogger = new Logger('Global')
 
 env.NODE_ENV === "development" && app.use(logger());
 
@@ -55,14 +58,19 @@ app
   .route("/finnaux", finnaux);
 
 app.onError((err, c) => {
-  console.log({ err });
+  // console.log({ err })
   if (err instanceof ApiError) {
     return c.json({ message: err.message, data: null }, err.statusCode);
   }
 
   if (err instanceof HTTPException) {
+    const HTTPExceptionLogger = new Logger('HTTPException')
+    HTTPExceptionLogger.error(err.message)
     return c.json({ message: err.message, data: null }, err.status);
   }
+
+  globalLogger.error(err.message)
+
   return c.json(
     { message: "Internal Server Error", data: null },
     httpStatus.INTERNAL_SERVER_ERROR
@@ -73,7 +81,8 @@ app.notFound((c) => {
   return c.json({ message: httpStatus[404], data: null }, httpStatus.NOT_FOUND);
 });
 
-console.log(`Server is running on http://localhost:${PORT}`);
+// console.log(`Server is running on http://localhost:${PORT}`);
+globalLogger.info(`Server is running on http://localhost:${PORT}`)
 
 job
 

@@ -61,6 +61,8 @@ export const longFormTable = pgTable("longFormTable", (db) => ({
     createdAt: db.timestamp({ mode: "string", withTimezone: true }).defaultNow(),
     updatedAt: db.timestamp({ mode: "string", withTimezone: true }).$onUpdateFn(() => sql`now()`),
     isFullyFilled: db.boolean().default(false),
+    isContinueApplicationLinkSent: db.boolean().default(false),
+    stepsCompleted: db.integer(),
 
     // finnaux
     status: applicationStatusEnum().$default(() => "PENDING"),

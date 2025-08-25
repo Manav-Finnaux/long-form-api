@@ -8,6 +8,11 @@ type ConfirmationEmailType = {
   name: string
 }
 
+type ContinueLoanEmailType = {
+  name: string;
+  continueUrl: string;
+}
+
 const SOCIAL_MEDIA_LINKS = {
   faceBook: "https://www.facebook.com/people/Northwestern-Finance/61572646620869/",
   x: "https://x.com/",
@@ -79,6 +84,21 @@ function Footer() {
   )
 }
 
+function Header() {
+  return (
+    <Section style={{ textAlign: "center", marginBottom: "30px" }}>
+      <Img
+        src={`${env.SERVER_URL}/public/company_logo.jpg`}
+        alt="Northwestern Finance Logo"
+        width="120"
+        height="auto"
+        fetchPriority="high"
+        style={{ margin: "0 auto" }}
+      />
+    </Section>
+  )
+}
+
 function OtpEmail({ name, otp }: OtpEmailType) {
   const mainOtp = { backgroundColor: "#f6f9fc", fontFamily: "Helvetica, Arial, sans-serif", padding: "20px" };
   const containerOtp = { backgroundColor: "#ffffff", borderRadius: "8px", padding: "30px", maxWidth: "480px", margin: "0 auto" };
@@ -93,16 +113,7 @@ function OtpEmail({ name, otp }: OtpEmailType) {
       {/* <Preview>Email Verification - Your OTP Code</Preview> */}
       <Body style={mainOtp}>
         <Container style={containerOtp}>
-          <Section style={{ textAlign: "center", marginBottom: "30px" }}>
-            <Img
-              src={`${env.SERVER_URL}/public/company_logo.jpg`}
-              alt="Northwestern Finance Logo"
-              width="120"
-              height="auto"
-              fetchPriority="high"
-              style={{ margin: "0 auto" }}
-            />
-          </Section>
+          <Header />
 
           <Heading style={headingOtp}>Let's get started</Heading>
           <Text style={textOtp}>Dear {name},</Text>
@@ -123,28 +134,6 @@ function OtpEmail({ name, otp }: OtpEmailType) {
           <Text style={textOtp}><strong>Northwestern Finance</strong></Text>
 
           <Footer />
-
-          {/* <Section style={footerContainer}>
-            <a href="https://www.nwfinance.in/" style={footerLink}>Home</a>
-            <a href="https://www.nwfinance.in/contact" style={footerLink}>Contact Us</a>
-            <a href="https://www.nwfinance.in/privacypolicy" style={footerLink}>Privacy Policy</a>
-
-            <Text style={footerText}>
-              This e-mail is intended for the addressee shown. It contains information that is
-              con dential and protected from disclosure. Any review, dissemination or use of this
-              transmission or its contents by persons or unauthorized employees of the intended
-              organizations is strictly prohibited.
-            </Text>
-            <Text style={footerText}>
-              Northwestern Finance is a division of Shahji Fintech Private Ltd, a Non-Banking Financial Company
-              (NBFC) registered with the Reserve Bank of India (RBI) under the RBI Act, 1934 with CIN
-              U72900RJ2016PTC055249.
-            </Text>
-            <Text style={footerText}>&copy; 2025 Northwestern Finance</Text>
-            <Text style={footerText}>
-              Northwestern Finance, NW Finance, and the Northwestern Finance brand mark are trademarks of Shahji Fintech Private Ltd.
-            </Text>
-          </Section> */}
         </Container>
       </Body>
     </Html>
@@ -162,20 +151,68 @@ function ConfirmationEmail({ name }: ConfirmationEmailType) {
       <Preview>Thank you for submitting your information - we&apos;re reviewing everything.</Preview>
       <Body style={mainContainer}>
         <Container style={container}>
-          <Section style={{ textAlign: "center", marginBottom: "30px" }}>
-            <Img
-              src={`${env.SERVER_URL}/public/company_logo.jpg`}
-              alt="Northwestern Finance Logo"
-              width="120"
-              fetchPriority="high"
-              height="auto"
-            />
-          </Section>
+          <Header />
 
           <Text style={headingText}>Dear {name},</Text>
           <Text style={headingText}>Thank you for submitting your information! We&apos;re currently reviewing everything to ensure it&apos;s all in order.</Text>
           <Text style={headingText}>If anything else is needed, we&apos;ll reach out. Otherwise, you&apos;ll be notified once the process is complete.</Text>
           <Text style={{ ...headingText, marginTop: "24px" }}>Sincerely,<br /><strong>Northwestern Finance</strong></Text>
+
+          <Footer />
+        </Container>
+      </Body>
+    </Html>
+  );
+}
+
+function ContinueLoanEmail({ name, continueUrl }: ContinueLoanEmailType) {
+  const mainContainer = { backgroundColor: "#f6f9fc", fontFamily: "Helvetica, Arial, sans-serif", padding: "20px" };
+  const container = { backgroundColor: "#ffffff", borderRadius: "8px", padding: "30px", maxWidth: "480px", margin: "0 auto" };
+  const headingText = { fontSize: "16px", lineHeight: "24px", marginBottom: "20px", color: "#333333" };
+  const buttonStyle = {
+    display: "inline-block",
+    padding: "12px 24px",
+    backgroundColor: "#004085",
+    color: "#ffffff",
+    borderRadius: "6px",
+    textDecoration: "none",
+    fontWeight: "bold",
+    fontSize: "15px"
+  };
+
+  return (
+    <Html>
+      <Head />
+      <Preview>Continue your loan application with Northwestern Finance.</Preview>
+      <Body style={mainContainer}>
+        <Container style={container}>
+          <Header />
+
+          <Text style={headingText}>Dear {name},</Text>
+          <Text style={headingText}>
+            Your cash advance progress has been saved so far.
+          </Text>
+          <Text style={headingText}>
+            Please click the link below to continue your application.
+            <br />
+            <strong>This link is valid for 10 days.</strong>
+          </Text>
+
+          <Section style={{ textAlign: "center", margin: "30px 0" }}>
+            <a href={continueUrl} style={buttonStyle}>
+              Continue Application
+            </a>
+          </Section>
+
+          <Text style={headingText}>
+            If this link does not work, navigate to this URL in your browser:
+            <br />
+            <a href={continueUrl} style={{ color: "#004085" }}>{continueUrl}</a>
+          </Text>
+
+          <Text style={{ ...headingText, marginTop: "24px" }}>
+            Sincerely,<br /><strong>Northwestern Finance</strong>
+          </Text>
 
           <Footer />
         </Container>
@@ -190,4 +227,8 @@ export async function renderConfirmationEmail(name: string) {
 
 export async function renderOtpEmail(credentials: OtpEmailType) {
   return await render(<OtpEmail otp={credentials.otp} name={credentials.name} />)
+}
+
+export async function renderContinueLoanApplicationEmail(name: string, continueUrl: string) {
+  return await render(<ContinueLoanEmail name={name} continueUrl={continueUrl} />)
 }

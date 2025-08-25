@@ -1,6 +1,7 @@
 import { db } from "@/db"
 import { longFormTable } from "@/db/schemas/long-form"
 import { env } from "@/env"
+import { Logger } from "@/lib/logger"
 import { yupValidator } from "@/lib/yup/validator"
 import { createCookieSchema, createCookieSchemaType } from "@/routes/long-form/schema"
 
@@ -30,7 +31,10 @@ app.put(
         );
         console.log('existing session detected: ', decoded)
         existingUserId = decoded.id as string;
-      } catch (err) { }
+      } catch (err: any) {
+        const initiateErrorLogger = new Logger('InitiateStep')
+        initiateErrorLogger.error(err.message ?? 'existing session found but decoding failed.')
+      }
     }
     let result = null;
 

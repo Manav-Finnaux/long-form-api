@@ -1,13 +1,15 @@
-import { existsSync } from "fs"
-import { mkdir, writeFile } from "fs/promises"
-import path, { dirname } from "path"
-import fs from "fs/promises"
+import { UPLOAD_DIR } from "@/constants"
 import ApiError from "@/lib/error-handler"
+import { Logger } from "@/lib/logger"
+import { existsSync } from "fs"
+import fs, { mkdir, readdir, unlink, writeFile } from "fs/promises"
+import path, { dirname } from "path"
 
 export async function storeFile(file: File, id: string, fileType: string) {
   try {
     const newFileName = id + '-' + fileType + '-' + file.name
-    const filePath = `./src/uploads/${newFileName}`
+    // const filePath = `./src/uploads/${newFileName}`
+    const filePath = path.join(UPLOAD_DIR, newFileName)
     const dir = dirname(filePath)
 
     if (!existsSync(dir)) {
@@ -21,12 +23,10 @@ export async function storeFile(file: File, id: string, fileType: string) {
 
     return { message: `${newFileName} saved successfully`, filePath }
   } catch (error: any) {
-    console.error(`Error saving file:`, error)
+    // console.error(`Error saving file:`, error)
     throw new ApiError(500, error.message ? `Failed to save file: ${error.message}` : 'Unknown Error')
   }
 }
-
-
 
 async function getData(src: string) {
   const file = (await fs.readFile(src)).toString('base64')
@@ -68,4 +68,36 @@ export function fifo(array: string[], newValues: string[]) {
   }
 
   return returnArray;
+}
+
+export async function deleteGarbageFiles(ids: string[]) {
+  const deleteGarbageFilesLogger = new Logger('DeleteGarbageFiles')
+  const filesToDelete = await getFilePathsFromIDs(ids);
+
+  await Promise.all(filesToDelete.map(async (fileName) => {
+    // const filePath = `${BASE_PATH}/${fileName}`;
+    const filePath = path.join(UPLOAD_DIR, fileName)
+
+    try {
+      await unlink(filePath)
+      deleteGarbageFilesLogger.info(`${fileName} deleted.`)
+    }
+    catch (e: any) {
+      deleteGarbageFilesLogger.error(`Encountered an error when deleting file: ${fileName}\n${e.message ?? ''}`);
+    }
+  }))
+}
+
+export async function getFilePathsFromIDs(ids: string[]) {
+  const allFiles = await readdir(UPLOAD_DIR)
+  const filesArr: string[] = [];
+
+  for (let id of ids) {
+    const fileList = allFiles.filter((file) => file.includes(id))
+
+    if (fileList.length > 0) {
+      filesArr.push(...fileList)
+    }
+  }
+  return filesArr;
 }

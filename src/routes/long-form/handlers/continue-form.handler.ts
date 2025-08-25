@@ -1,77 +1,131 @@
+import { db } from "@/db"
+import { longFormTable } from "@/db/schemas/long-form"
+import { env } from "@/env"
+import ApiError from "@/lib/error-handler"
+import { Logger } from "@/lib/logger"
 import yup from "@/lib/yup"
 import { yupValidator } from "@/lib/yup/validator"
+import { decryptFromUrlSafe, isFullyFilled } from "@/utils"
+import { eq, sql } from "drizzle-orm"
 
 import { Hono } from "hono"
+import { setCookie } from "hono/cookie"
+import { sign } from "hono/jwt"
+import HttpStatus from "http-status"
 
 const app = new Hono()
 
 app.get(
-  "/:encryptedId",
-  yupValidator("param", yup.object({ encryptedId: yup.string().required() })),
+  "/:token",
+  yupValidator("param", yup.object({ token: yup.string().required() })),
   async (c) => {
-    const { encryptedId } = c.req.valid("param");
+    const continueFormLogger = new Logger('ContinueFormLogger')
+    const { token } = c.req.valid("param");
 
+    // * decrypt encrypted id
+    const id = decryptFromUrlSafe(token)
 
-    // decrypt encrypted id
+    // * check if id is of the form of an UUID
+    const schema = yup.object({
+      id: yup.string().uuid().required()
+    })
+    try {
+      await schema.validate({ id })
+    }
+    catch (e: any) {
+      continueFormLogger.error(e.message ?? "id could not be validated; it was not UUID")
+      throw new ApiError(HttpStatus.BAD_REQUEST, 'Invalid request parameters.');
+    }
 
-    // verify if this id exists in db or not
+    // * verify if this id exists in db or not
+    const [row] = await db
+      .select({
+        // Step 1: Personal Info
+        name: longFormTable.name,
+        fatherName: longFormTable.fatherName,
+        dob: longFormTable.dob,
+        gender: longFormTable.gender,
+        mobileNo: longFormTable.mobileNo,
+        mobileVerified: longFormTable.isMobileOtpVerified,
+        personalEmail: longFormTable.personalEmail,
+        personalEmailVerified: longFormTable.isPersonalEmailOtpVerified,
 
-    // if yes, create cookie from this id
-    // else, return bad response
+        // Step 2: Income Details
+        incomeType: longFormTable.incomeType,
+        designation: longFormTable.designation,
+        monthlyIncome: longFormTable.monthlyIncome,
+        workingYears: longFormTable.workingYears,
 
-    /**
-     * const jwt = await sign(
-        { id: result.id },
-        env.ANONYMOUS_CUSTOMER_JWT_SECRET
-      );
+        // Step 3: Loan Details
+        loanAmount: longFormTable.loanAmount,
+        loanPeriod: longFormTable.loanPeriod,
+        loanPurpose: longFormTable.loanPurpose,
+        preferredEmiDate: longFormTable.preferredEmiDate,
+        bankAccountNo: longFormTable.bankAccountNo,
+        ifscCode: longFormTable.ifscCode,
+        bankName: longFormTable.bankName,
 
-      setCookie(c, env.COOKIE_NAME, jwt, {
-        secure: true,
-        httpOnly: true,
-        sameSite: "none",
-        expires: new Date(Date.now() + 1000 * 60 * 60), // 60 minutes
-      });
-     */
+        // Step 4: Address
+        address1: longFormTable.address1,
+        address2: longFormTable.address2,
+        landmark: longFormTable.landmark,
+        pinCode: longFormTable.pinCode,
+        area: longFormTable.area,
+        district: longFormTable.district,
+        state: longFormTable.state,
 
-    // send ok!
+        // Step 5: Document Uploads
+        aadhaarNo: longFormTable.aadhaarNo,
+        canProceedWithAadhaarNo: sql<boolean>`false`,
+        panNo: longFormTable.panNo,
+        canProceedWithPanNo: sql<boolean>`false`,
+        isProfilePictureUploaded: sql<boolean>`${longFormTable.profilePicture} is not null`,
+        isAadhaarFrontUploaded: sql<boolean>`${longFormTable.aadhaarFront} is not null`,
+        isAadhaarBackUploaded: sql<boolean>`${longFormTable.aadhaarBack} is not null`,
+        isPanCardUploaded: sql<boolean>`${longFormTable.panCard} is not null`,
+        termsAccepted: longFormTable.termsAccepted,
+
+        // Step 6: Company details
+        organizationName: longFormTable.organizationName,
+        officeEmail: longFormTable.officeEmail,
+        officeEmailVerified: longFormTable.isOfficeEmailVerified,
+        isSalarySlipsUploaded: sql<boolean>`${longFormTable.salarySlips} is not null`,
+        isBankStatementUploaded: sql<boolean>`${longFormTable.bankStatement} is not null`,
+
+        // Step 6-b
+        isEmploymentProofDocumentUploaded: sql<boolean>`${longFormTable.employmentProofDocument} is not null`,
+
+        // meta
+        lastFilledStep: longFormTable.stepsCompleted,
+        isFullyFilled: longFormTable.isFullyFilled
+      })
+      .from(longFormTable)
+      .where(eq(longFormTable.id, id))
+
+    // * if no, throw error ortherwise create cookie from this id
+    if (!row) {
+      throw new ApiError(HttpStatus.NOT_FOUND, 'User not found')
+    }
+
+    if (row.isFullyFilled) {
+      throw new ApiError(HttpStatus.CONFLICT, 'Form already filled.')
+    }
+
+    const jwt = await sign(
+      { id },
+      env.ANONYMOUS_CUSTOMER_JWT_SECRET
+    )
+
+    setCookie(c, env.COOKIE_NAME, jwt, {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+      expires: new Date(Date.now() + 1000 * 60 * 60), // 60 minutes
+    })
+
+    // * send ok!
+    return c.json({ data: row }, HttpStatus.OK)
   }
 )
 
 export { app as continueForm }
-
-// * Before working on this API, I've to see how to manage form continuation from the step asked
-// * meaning, update the API of the asked step and see how will you handle if the same API is called again
-// * you shouldn't send email to the user? will the link be a one time link? don't send email to the user;
-// * instead, add a column to the longFormTable, called, validTill (or something like that), and keep it null by default
-// * and fill it with timestamp in the suggested step. 
-// * in the rest of the APIs, see if its null, -> ignore, else, check if the request is valid ~if(validTill >= sevenDaysBeforeNow ) and then if that's true, update with current time stamp 
-// * on suggested step, update the validTill field in db
-
-
-// * FLOW:
-// * 1. user starts filling the form and reaches the suggested step.
-// * in this step, the validTill field should be updated and an email should be sent to the user
-// * the user can either fill the form completely, or leave it incomplete
-// * regardless of whether they leave or fill it, user will receive an email with a link to update their data
-
-// * 2. when they click the link and come to update the form, the following will happen:
-// * user will have access to all steps of the form and the pre-filled data will be available for the user to see
-// * on each step, some time stamp field will be updated which will increase the validity of the link
-
-
-
-// app.get(
-//   "/test",
-//   async (c) => {
-//     const [{ id }] = await db.select({ id: longFormTable.id }).from(longFormTable).limit(1);
-
-//     const KEY = 'SUPER_SECRET_KEY'
-
-//     const cipher = Crypto.AES.encrypt(id, KEY).toString()
-
-//     const bytes = Crypto.AES.decrypt(cipher, KEY)
-//     const original = bytes.toString(Crypto.enc.Utf8)
-
-//     console.log({ cipher, original })
-//   }
-// )
